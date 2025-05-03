@@ -1,10 +1,12 @@
-// components/ProfileCard.js
 import { Fragment } from 'react'
 import Image from 'next/image'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'
+import { useSession } from "next-auth/react";
 
 export default function ProfileCard({ name, avatarUrl, settingsOptions = [] }) {
+  const { data: session } = useSession()
+
   return (
     <div className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center space-y-4">
       {/* Settings Menu */}
@@ -44,7 +46,7 @@ export default function ProfileCard({ name, avatarUrl, settingsOptions = [] }) {
       <div className="relative rounded-full bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200 p-1">
         <div className="w-28 h-28 rounded-full overflow-hidden bg-white">
           <Image
-            src={avatarUrl}
+            src={session?.user.avatarUrl || "/default.jpg"}
             alt={`${name} avatar`}
             width={112}
             height={112}
