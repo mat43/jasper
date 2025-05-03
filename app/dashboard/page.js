@@ -8,6 +8,8 @@ import ProfileCard from '@/components/ProfileCard'
 import SpendingBarChart from '@/components/SpendingBarChart'
 import AccountSettingsModal from '@/components/AccountSettingsModal';
 import { useSession, signOut } from 'next-auth/react';
+import WeatherWidget from '@/components/WeatherWidget';
+import UpcomingEvents from '@/components/UpcomingEvents';
 
 /**
  * read a key from localStorage on mount and keep it in state,
@@ -145,34 +147,10 @@ export default function HomePage() {
 				</div>
 
 				{/* Weather (1x1) */}
-				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-yellow-50 to-yellow-100 flex flex-col justify-between">
-					<div className="flex justify-between items-start">
-						<div>
-							<h2 className="text-lg font-semibold text-gray-800">Weather</h2>
-							<p className="text-3xl font-bold text-gray-900 mt-2">72°F</p>
-							<p className="text-gray-700">Sunny</p>
-						</div>
-						<img
-							src="/sun.png"
-							alt="Sunny icon"
-							className="
-                flex-shrink-0   /* never squish */
-                mt-3
-                object-contain
-                h-auto
-                w-24  
-              "
-						/>
-					</div>
-					<div className="mt-4 flex justify-between text-sm text-gray-600">
-						<span>Humidity: 40%</span>
-						<span>Wind: 5 mph</span>
-					</div>
-				</div>
-
+				<WeatherWidget />
 
 				{/* House Temp (1x1) */}
-				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-red-50 to-red-100 flex flex-col justify-between">
+				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-red-50 to-red-100 flex flex-col justify-between transition-shadow duration-300 ease-in-out hover:shadow-xl">
 					<h2 className="text-lg font-semibold text-gray-800">House Temperature</h2>
 					<div className="flex justify-between mx-3">
 						<p className="text-3xl font-bold text-gray-900 mt-2">72°F</p>
@@ -185,20 +163,10 @@ export default function HomePage() {
 				</div>
 
 				{/* Upcoming Events (1x2) */}
-				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100 flex flex-col justify-between">
-					<h2 className="text-lg font-semibold text-gray-800">Upcoming Events</h2>
-					<ul className="mt-4 space-y-2 overflow-auto text-gray-700 flex-1">
-						{events.map((e, i) => (
-							<li key={i} className="flex justify-between">
-								<span>{e.label}</span>
-								<span className="text-sm text-gray-500">{e.time}</span>
-							</li>
-						))}
-					</ul>
-				</div>
+				<UpcomingEvents />
 
 				{/* Spending (1x2) */}
-				<div className="row-span-2 col-span-1 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col justify-between">
+				<div className="row-span-2 col-span-1 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col justify-between transition-shadow duration-300 ease-in-out hover:shadow-xl">
 					<h2 className="text-lg font-semibold text-gray-800 text-center">Spending in April</h2>
 					{/* Chart */}
 					<SpendingBarChart data={categoryBreakdown} />
@@ -228,7 +196,7 @@ export default function HomePage() {
 				</div>
 
 				{/* Weekly Chores */}
-				<div className="row-span-2 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-pink-50 to-pink-100 flex flex-col">
+				<div className="row-span-2 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-pink-50 to-pink-100 flex flex-col transition-shadow duration-300 ease-in-out hover:shadow-xl">
 					<h2 className="text-lg font-semibold text-gray-800">Weekly Chores</h2>
 					<ul className="mt-4 space-y-2">
 						{tasks.map((task, idx) => (
@@ -251,7 +219,7 @@ export default function HomePage() {
 				</div>
 
 				{/* Home Assistant (1x1) */}
-				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col justify-center">
+				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col justify-center transition-shadow duration-300 ease-in-out hover:shadow-xl">
 					<h2 className="text-lg font-semibold text-gray-800 text-center">Home Assistant</h2>
 					<button className="mt-4 w-full bg-white text-blue-600 py-2 rounded-lg shadow hover:shadow-md active:bg-stone-100 hover:cursor-pointer transition duration-200">
 						Open Assistant
@@ -259,7 +227,7 @@ export default function HomePage() {
 				</div>
 
 				{/* Manage Network (1x1) */}
-				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-teal-50 to-teal-100 flex flex-col justify-center">
+				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-teal-50 to-teal-100 flex flex-col justify-center transition-shadow duration-300 ease-in-out hover:shadow-xl">
 					<h2 className="text-lg font-semibold text-gray-800 text-center">Manage Network</h2>
 					<button className="mt-4 w-full bg-white text-teal-600 py-2 rounded-lg shadow hover:shadow-md active:bg-stone-100 hover:cursor-pointer transition duration-200">
 						Configure Wi-Fi
@@ -267,7 +235,7 @@ export default function HomePage() {
 				</div>
 
 				{/* Shared Files (1x1) */}
-				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-purple-50 to-purple-100 flex flex-col justify-center">
+				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-purple-50 to-purple-100 flex flex-col justify-center transition-shadow duration-300 ease-in-out hover:shadow-xl">
 					<h2 className="text-lg font-semibold text-gray-800 text-center">Shared Files</h2>
 					<a href="https://drive.google.com/drive/folders/1CBMhXttqoCN8xnErzPDrqLj0zizn5HrR?usp=sharing">
 						<button className="mt-4 w-full bg-white text-purple-600 py-2 rounded-lg shadow hover:shadow-md active:bg-stone-100 hover:cursor-pointer transition duration-200">
@@ -277,7 +245,7 @@ export default function HomePage() {
 				</div>
 
 				{/* Expenses (1x1) */}
-				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col justify-center">
+				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col justify-center transition-shadow duration-300 ease-in-out hover:shadow-xl">
 					<h2 className="text-lg font-semibold text-gray-800 text-center">Expenses</h2>
 					<button onClick={() => router.push('/dashboard/expenses')} className="mt-4 w-full bg-white text-amber-600 py-2 rounded-lg shadow hover:shadow-md active:bg-stone-100 hover:cursor-pointer transition duration-200">
 						Open Expenses
@@ -287,7 +255,7 @@ export default function HomePage() {
 			</div>
 
 			{/* Notifications full width */}
-			<div className="mt-6 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-gray-50 to-gray-100">
+			<div className="mt-6 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 transition-shadow duration-300 ease-in-out hover:shadow-xl">
 				<h2 className="text-lg font-semibold text-gray-800 mb-3 text-center">Notifications</h2>
 				<ul className="space-y-2 overflow-auto max-h-64 text-gray-800">
 					{notifications.map((n, i) => (
