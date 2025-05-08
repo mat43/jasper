@@ -2,12 +2,9 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]/route';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
-
-// Initalize database client
-const prisma = new PrismaClient();
 
 export async function PATCH(req) {
 	// Authentication
@@ -45,7 +42,7 @@ export async function PATCH(req) {
 	};
 	// Conditionally include password
 	if (password && password === confirm) {
-		const bcrypt = await import('bcrypt');
+		const bcrypt = await import('bcryptjs');
 		updateData.password = await bcrypt.hash(password, 10);
 	}
 

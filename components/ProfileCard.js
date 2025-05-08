@@ -1,14 +1,16 @@
+'use client'
+
 import { Fragment } from 'react'
 import Image from 'next/image'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline'
 import { useSession } from "next-auth/react";
 
-export default function ProfileCard({ name, avatarUrl, settingsOptions = [] }) {
+export default function ProfileCard({ name, settingsOptions = [] }) {
 	const { data: session } = useSession()
 
 	return (
-		<div className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center space-y-4 transition-shadow duration-300 ease-in-out hover:shadow-xl">
+		<div className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center space-y-4 transition-shadow duration-300 ease-in-out hover:shadow-xl min-h-56">
 			{/* Settings Menu */}
 			<Menu as="div" className="absolute top-4 right-4">
 				<MenuButton className="p-2 hover:bg-gray-100 rounded-full focus:outline-none">

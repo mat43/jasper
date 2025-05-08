@@ -1,3 +1,6 @@
+// This is a Next.js API route that fetches events from a Google Calendar
+
+// Imports
 import { NextResponse } from "next/server";
 
 export async function GET() {

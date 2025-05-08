@@ -3,44 +3,14 @@
 // Imports
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckIcon } from '@heroicons/react/24/solid'
 import ProfileCard from '@/components/ProfileCard'
 import SpendingBarChart from '@/components/SpendingBarChart'
 import AccountSettingsModal from '@/components/AccountSettingsModal';
 import { useSession, signOut } from 'next-auth/react';
 import WeatherWidget from '@/components/WeatherWidget';
 import UpcomingEvents from '@/components/UpcomingEvents';
-
-/**
- * read a key from localStorage on mount and keep it in state,
- * then write it back whenever it changes.
- */
-function useLocalStorage(key, initialValue) {
-	const [storedValue, setStoredValue] = useState(initialValue)
-
-	// on mount, read the value
-	useEffect(() => {
-		try {
-			const item = window.localStorage.getItem(key)
-			if (item !== null) {
-				setStoredValue(JSON.parse(item))
-			}
-		} catch (err) {
-			console.error(`Failed to load ${key} from localStorage`, err)
-		}
-	}, [key])
-
-	// whenever it changes, write it
-	useEffect(() => {
-		try {
-			window.localStorage.setItem(key, JSON.stringify(storedValue))
-		} catch (err) {
-			console.error(`Failed to save ${key} to localStorage`, err)
-		}
-	}, [key, storedValue])
-
-	return [storedValue, setStoredValue]
-}
+import WeeklyChores from '@/components/WeeklyChores';
+import SpendingCard from '@/components/SpendingCard'
 
 // We just store name in database, so split it up
 function splitName(fullName) {
@@ -53,57 +23,14 @@ export default function HomePage() {
 	const router = useRouter();
 
 	const [notifications] = useState([
-		'Brycen paid Michael $25 for rent',
+		'Alyssa unlocked the front door at 11:52pm',
 		'Water leak detected',
 		'Who ate the last slice of pizza',
 		'New login from unknown device',
 	])
+
 	const [showSettings, setShowSettings] = useState(false);
-
-	const defaultChores = [
-		{ label: 'Take out trash', done: false },
-		{ label: 'Clean kitchen', done: false },
-		{ label: 'Clean restroom', done: false },
-		{ label: 'Mow the lawn', done: false },
-		{ label: 'Sweep floors', done: false },
-		{ label: 'Mop floors', done: false },
-		{ label: 'Clean out fridge', done: false },
-		{ label: 'Clean oven', done: false },
-	]
-
-	const categoryBreakdown = [
-		{ category: 'Groceries', value: 1200 },
-		{ category: 'Rent', value: 1500 },
-		{ category: 'Utilities', value: 400 },
-		{ category: 'Entertainment', value: 350 },
-	]
-
-	const [tasks, setTasks] = useLocalStorage('weeklyChores', defaultChores)
-
-	function toggleTask(index) {
-		setTasks((prev) =>
-			prev.map((t, i) =>
-				i === index ? { ...t, done: !t.done } : t
-			)
-		)
-	}
-
-	useEffect(() => {
-		localStorage.setItem('weeklyChores', JSON.stringify(tasks))
-	}, [tasks])
-
-	const [events] = useState([
-		{ label: 'Rent due', time: 'Today' },
-		{ label: 'Meeting with landlord', time: '3:00 pm' },
-		{ label: 'Family dinner', time: 'Tuesday at 4:00pm' },
-	])
-
-	const totalThisMonth = 3450
-	const roommates = 5
-	const avgPerPerson = (totalThisMonth / roommates).toFixed(2)
-	const topCategory = 'Groceries'
-	const topCategoryAmount = 1200
-
+	
 	// Redirect if not signed in
 	useEffect(() => {
 		if (status === 'unauthenticated') {
@@ -166,57 +93,10 @@ export default function HomePage() {
 				<UpcomingEvents />
 
 				{/* Spending (1x2) */}
-				<div className="row-span-2 col-span-1 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col justify-between transition-shadow duration-300 ease-in-out hover:shadow-xl">
-					<h2 className="text-lg font-semibold text-gray-800 text-center">Spending in April</h2>
-					{/* Chart */}
-					<SpendingBarChart data={categoryBreakdown} />
-					{/* or, instead of the progress bar, do: */}
-					<div className="mt-4">
-						<h3 className="text-sm font-medium text-gray-700 mb-2">
-							Latest Transactions
-						</h3>
-						<ul className="space-y-1 text-gray-600 text-sm">
-							{[
-								{ label: 'Rent', amount: 1500 },
-								{ label: 'Groceries', amount: 1200 },
-								{ label: 'Utilities', amount: 400 }
-							].map((t, i) => (
-								<li key={i} className="flex justify-between">
-									<span>{t.label}</span>
-									<span>${t.amount}</span>
-								</li>
-							))}
-						</ul>
-					</div>
-
-					<div className="mt-6 flex flex-col sm:flex-row sm:justify-around text-sm text-gray-600 space-y-2 sm:space-y-0">
-						<span>Avg/person: ${avgPerPerson}</span>
-						<span>Top Category: {topCategory} (${topCategoryAmount})</span>
-					</div>
-				</div>
+				<SpendingCard />
 
 				{/* Weekly Chores */}
-				<div className="row-span-2 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-pink-50 to-pink-100 flex flex-col transition-shadow duration-300 ease-in-out hover:shadow-xl">
-					<h2 className="text-lg font-semibold text-gray-800">Weekly Chores</h2>
-					<ul className="mt-4 space-y-2">
-						{tasks.map((task, idx) => (
-							<li
-								key={idx}
-								onClick={() => toggleTask(idx)}
-								className="flex items-center cursor-pointer select-none"
-							>
-								<CheckIcon
-									className={`w-5 h-5 flex-shrink-0 ${task.done ? 'text-green-500' : 'text-gray-300'
-										}`} />
-								<span
-									className={`ml-2 ${task.done ? 'line-through text-gray-500' : ''
-										}`}>
-									{task.label}
-								</span>
-							</li>
-						))}
-					</ul>
-				</div>
+				<WeeklyChores />
 
 				{/* Home Assistant (1x1) */}
 				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col justify-center transition-shadow duration-300 ease-in-out hover:shadow-xl">

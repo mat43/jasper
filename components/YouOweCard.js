@@ -1,14 +1,42 @@
-// Imports
+// components/YouOweCard.jsx
+'use client'
+
+import React from 'react'
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline'
 
-export default function YouOweCard({ youOwe, pendingSettlements, monthlyBudget = 500 }) {
-	const numItems = pendingSettlements.length
-	const categoriesOwed = Array.from(new Set(pendingSettlements.map(s => s.category)))
-	const largestPending = numItems
-		? Math.max(...pendingSettlements.map(s => s.amount))
+export default function YouOweCard({
+	transactions = [],
+	currentUser
+}) {
+	// parse JSON-string assignees
+	function getAssignees(arr) {
+		try {
+			return Array.isArray(arr) ? arr : JSON.parse(arr || '[]')
+		} catch {
+			return []
+		}
+	}
+
+	// all entries where you are an assignee
+	const allForYou = transactions.filter(t => {
+		const assignees = getAssignees(t.assignees)
+		return assignees.includes(currentUser)
+	})
+
+	// unpaid subset
+	const pending = allForYou.filter(t => !t.paid)
+
+	// totals
+	const totalAll = allForYou.reduce((sum, t) => sum + t.amount, 0)
+	const youOwe = pending.reduce((sum, t) => sum + t.amount, 0)
+	const numItems = pending.length
+	const categoriesOwed = Array.from(new Set(pending.map(t => t.category)))
+	const largestPending = numItems ? Math.max(...pending.map(t => t.amount)) : 0
+
+	// % paid = (totalAll - youOwe) / totalAll * 100
+	const percentPaid = totalAll > 0
+		? ((totalAll - youOwe) / totalAll) * 100
 		: 0
-	const owedPct = Math.min((youOwe / monthlyBudget) * 100, 100)
-	const paidPct = 100 - owedPct
 
 	return (
 		<div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg p-6 space-y-4">
@@ -39,7 +67,7 @@ export default function YouOweCard({ youOwe, pendingSettlements, monthlyBudget =
 			<div className="w-full bg-green-200 rounded-full h-2 overflow-hidden">
 				<div
 					className="h-2 bg-green-600 rounded-full transition-all duration-500"
-					style={{ width: `${paidPct}%` }}
+					style={{ width: `${percentPaid}%` }}
 				/>
 			</div>
 		</div>

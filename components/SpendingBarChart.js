@@ -1,6 +1,7 @@
+// components/SpendingBarChart.jsx
 'use client'
 
-// Imports
+import React from 'react'
 import {
 	Chart as ChartJS,
 	CategoryScale,
@@ -20,16 +21,21 @@ ChartJS.register(
 	Legend
 )
 
-export default function SpendingBarChart({ data }) {
-	// data = [{ category: 'Groceries', value: 1200 }, ...]
-	const labels = data.map(d => d.category)
-	const values = data.map(d => d.value)
+export default function SpendingBarChart({ transactions = [] }) {
+	// Aggregate total spent per category
+	const categoryMap = transactions.reduce((acc, tx) => {
+		acc[tx.category] = (acc[tx.category] || 0) + tx.amount
+		return acc
+	}, {})
+
+	const labels = Object.keys(categoryMap)
+	const values = Object.values(categoryMap)
 
 	const chartData = {
 		labels,
 		datasets: [
 			{
-				label: 'This Month',
+				label: 'All Transactions',
 				data: values,
 				backgroundColor: labels.map((_, i) => {
 					// pastel palette
@@ -58,7 +64,7 @@ export default function SpendingBarChart({ data }) {
 				beginAtZero: true,
 				ticks: {
 					color: '#4B5563',
-					callback: (v) => `$${v}`, // prepend dollar sign
+					callback: v => `$${v}`, // prepend dollar sign
 				},
 				grid: {
 					color: '#E5E7EB', // gray-200

@@ -1,3 +1,5 @@
+'use client'
+
 // components/InfoCard.js
 export default function InfoCard({ title, children, className = '' }) {
 	return (

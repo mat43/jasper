@@ -1,12 +1,12 @@
+// This file is responsible for handling authentication using NextAuth.js.
+// It uses Prisma as the adapter to connect to the database and bcrypt for password hashing.
+
 // Imports
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
-
-// Initalize database client
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs'
 
 export const authOptions = {
 	// Hook in database
