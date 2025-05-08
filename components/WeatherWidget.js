@@ -87,11 +87,11 @@ export default function WeatherWidget() {
 			{/* Header */}
 			<div className="flex items-center justify-between mb-4">
 				<div className="space-y-1">
-					<h2 className="text-lg font-semibold text-gray-800">Weather</h2>
+					<h2 className="text-lg mt-2 font-semibold text-gray-800">Weather</h2>
 					<p className="text-2xl font-bold text-gray-900">{temp}°F</p>
 					<p className="text-sm text-gray-600 capitalize">{description}</p>
 				</div>
-				<Icon className={`w-12 h-12 ${color}`} />
+				<Icon className={`w-18 h-18 ${color}`} />
 			</div>
 
 			{/* Stats grid with colored left borders */}

@@ -10,7 +10,7 @@ export default function ProfileCard({ name, settingsOptions = [] }) {
 	const { data: session } = useSession()
 
 	return (
-		<div className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center space-y-4 transition-shadow duration-300 ease-in-out hover:shadow-xl min-h-56">
+		<div className="relative bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center space-y-4 transition-shadow duration-300 ease-in-out hover:shadow-xl min-h-60">
 			{/* Settings Menu */}
 			<Menu as="div" className="absolute top-4 right-4">
 				<MenuButton className="p-2 hover:bg-gray-100 rounded-full focus:outline-none">
@@ -45,12 +45,12 @@ export default function ProfileCard({ name, settingsOptions = [] }) {
 
 			{/* Avatar with Pastel Gradient Ring */}
 			<div className="relative rounded-full bg-gradient-to-r from-pink-200 via-purple-200 to-blue-200 p-1">
-				<div className="w-28 h-28 rounded-full overflow-hidden bg-white">
+				<div className="w-32 h-32 rounded-full overflow-hidden bg-white">
 					<Image
 						src={session?.user.avatarUrl || "/default.jpg"}
 						alt={`${name} avatar`}
-						width={112}
-						height={112}
+						width={144}
+						height={144}
 						className="object-cover"
 					/>
 				</div>
