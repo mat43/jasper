@@ -38,7 +38,8 @@ export default function RootLayout({ children }) {
 					)}
 
 					{/* CHAT WIDGET (hidden on /login) */}
-					{!isLogin && <ChatWidget />}
+					{/* Comment out chat code */}
+					{/* {!isLogin && <ChatWidget />} */}
 
 					{/* FOOTER (hidden on /login) */}
 					{!isLogin && (
