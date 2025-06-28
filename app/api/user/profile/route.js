@@ -5,6 +5,7 @@ import { authOptions } from '../../auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
+import { env } from 'process';
 
 export async function PATCH(req) {
 	// Authentication
@@ -24,7 +25,7 @@ export async function PATCH(req) {
 		const extMatch = avatar.match(/data:image\/(\w+);/);
 		const ext = extMatch ? extMatch[1] : 'png';
 		const filename = `${session.user.username}-${Date.now()}.${ext}`;
-		const uploadDir = path.join(process.cwd(), 'public/uploads');
+		const uploadDir = path.join(process.cwd(), env.UPLOAD_DIR || 'uploads');
 		if (!fs.existsSync(uploadDir)) {
 			fs.mkdirSync(uploadDir, { recursive: true });
 		}

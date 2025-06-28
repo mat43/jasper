@@ -135,7 +135,8 @@ export default function HomePage() {
 			</div>
 
 			{/* Notifications full width */}
-			<div className="mt-6 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 transition-shadow duration-300 ease-in-out hover:shadow-xl">
+			{/* Comment out notifications until implementation */}
+			{/* <div className="mt-6 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-gray-50 to-gray-100 transition-shadow duration-300 ease-in-out hover:shadow-xl">
 				<h2 className="text-lg font-semibold text-gray-800 mb-3 text-center">Notifications</h2>
 				<ul className="space-y-2 overflow-auto max-h-64 text-gray-800">
 					{notifications.map((n, i) => (
@@ -145,7 +146,7 @@ export default function HomePage() {
 						</li>
 					))}
 				</ul>
-			</div>
+			</div> */}
 			{showSettings && (
 				<AccountSettingsModal
 					user={{
