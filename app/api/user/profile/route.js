@@ -31,7 +31,7 @@ export async function PATCH(req) {
 		}
 		const uploadPath = path.join(uploadDir, filename);
 		fs.writeFileSync(uploadPath, buffer);
-		avatarUrl = `/uploads/${filename}`;
+		avatarUrl = `/${env.UPLOAD_DIR || 'uploads'}/${filename}`;
 	}
 
 	// Build update data
