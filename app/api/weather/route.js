@@ -14,7 +14,7 @@ export async function GET() {
 		}
 
 		const res = await fetch(
-			`https://api.openweathermap.org/data/2.5/forecast?q=Chicago,US&units=imperial&appid=${API_KEY}`
+			`https://api.openweathermap.org/data/2.5/forecast?q=Columbus,US&units=imperial&appid=${API_KEY}`
 		);
 		const data = await res.json();
 		if (!res.ok) {
