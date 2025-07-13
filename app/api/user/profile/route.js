@@ -3,9 +3,6 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '../../auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
-import fs from 'fs';
-import path from 'path';
-import { env } from 'process';
 
 export async function PATCH(req) {
 	// Authentication
@@ -17,21 +14,37 @@ export async function PATCH(req) {
 	// Parse JSON body
 	const { firstName, lastName, email, venmo, avatar, password, confirm } = await req.json();
 
-	// Handle Base64 avatar if present
+	// Upload avatar externally if provided in base64
 	let avatarUrl = avatar;
 	if (avatar && avatar.startsWith('data:')) {
-		const [, base64] = avatar.split(',');
-		const buffer = Buffer.from(base64, 'base64');
-		const extMatch = avatar.match(/data:image\/(\w+);/);
-		const ext = extMatch ? extMatch[1] : 'png';
-		const filename = `${session.user.username}-${Date.now()}.${ext}`;
-		const uploadDir = path.join(process.cwd(), env.UPLOAD_DIR || 'uploads');
-		if (!fs.existsSync(uploadDir)) {
-			fs.mkdirSync(uploadDir, { recursive: true });
+		try {
+			const [, base64] = avatar.split(',');
+			const mimeMatch = avatar.match(/data:(image\/\w+);/);
+			const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+			const ext = mimeType.split('/')[1] || 'png';
+			const filename = `${session.user.username}-${Date.now()}.${ext}`;
+			const buffer = Buffer.from(base64, 'base64');
+
+			// Prepare form data
+			const formData = new FormData();
+			formData.append('file', new Blob([buffer], { type: mimeType }), filename);
+
+			// Upload to external service
+			const uploadRes = await fetch('https://img.mathew.ws/upload', {
+				method: 'POST',
+				body: formData,
+			});
+
+			if (!uploadRes.ok) {
+				throw new Error('Avatar upload failed');
+			}
+
+			const uploadData = await uploadRes.json();
+			avatarUrl = uploadData.url + "/inline";
+		} catch (err) {
+			console.error('Upload error:', err);
+			return NextResponse.json({ error: 'Avatar upload failed' }, { status: 500 });
 		}
-		const uploadPath = path.join(uploadDir, filename);
-		fs.writeFileSync(uploadPath, buffer);
-		avatarUrl = `/${env.UPLOAD_DIR || 'uploads'}/${filename}`;
 	}
 
 	// Build update data
@@ -41,6 +54,7 @@ export async function PATCH(req) {
 		email,
 		venmoUsername: venmo,
 	};
+
 	// Conditionally include password
 	if (password && password === confirm) {
 		const bcrypt = await import('bcryptjs');
