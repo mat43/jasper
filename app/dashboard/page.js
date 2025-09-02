@@ -9,7 +9,7 @@ import AccountSettingsModal from '@/components/AccountSettingsModal';
 import { useSession, signOut } from 'next-auth/react';
 import WeatherWidget from '@/components/WeatherWidget';
 import UpcomingEvents from '@/components/UpcomingEvents';
-import WeeklyChores from '@/components/WeeklyChores';
+import GroceryList from '@/components/GroceryList';
 import SpendingCard from '@/components/SpendingCard'
 
 // We just store name in database, so split it up
@@ -95,8 +95,8 @@ export default function HomePage() {
 				{/* Spending (1x2) */}
 				<SpendingCard />
 
-				{/* Weekly Chores */}
-				<WeeklyChores />
+				{/* Grocery List */}
+				<GroceryList />
 
 				{/* Home Assistant (1x1) */}
 				<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col justify-center transition-shadow duration-300 ease-in-out hover:shadow-xl">
