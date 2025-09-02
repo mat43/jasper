@@ -43,5 +43,7 @@ next-env.d.ts
 # user uploads
 public/uploads
 
-# prisma
-prisma/
+#prisma
+prisma/prod.db
+prisma/migrations
+prisma/seed.js

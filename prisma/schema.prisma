@@ -1,0 +1,57 @@
+// This file contains the Prisma schema for the database models used in the application.
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  password      String
+  name          String?
+  avatarUrl     String?
+  email         String?   @unique
+  venmoUsername String?
+}
+
+model List {
+  id         String   @id @default(cuid())
+  label      String
+  done       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model ExpenseTemplate {
+  id           Int       @id @default(autoincrement())
+  description  String
+  amount       Float
+  category     String
+  assignees    String    // JSON array of usernames
+  recurring    Boolean   @default(false)
+  frequency    String?   // "weekly" | "monthly"
+  dayOfMonth   Int?      // for monthly
+  dayOfWeek    String?   // for weekly ("monday", etc.)
+  createdBy    String
+  createdAt    DateTime  @default(now())
+
+  occurrences  Expense[] // Relation field
+}
+
+model Expense {
+  id             Int       @id @default(autoincrement())
+  description    String
+  amount         Float
+  category       String
+  assignees      String    // JSON array
+  paid           Boolean   @default(false)
+  createdBy      String
+  createdAt      DateTime  @default(now())  
+  templateId     Int?      
+  template       ExpenseTemplate? @relation(fields: [templateId], references: [id])
+}
+
