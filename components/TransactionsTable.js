@@ -112,7 +112,7 @@ export default function TransactionsTable({
 
 		const { id, amount, description } = settleModal
 
-		// Mark expense paid
+		// Mark expense paid first
 		try {
 			const patch = await fetch(`/api/expenses/${id}`, {
 				method: 'PATCH',
@@ -126,7 +126,7 @@ export default function TransactionsTable({
 			return
 		}
 
-		// If Venmo, open deep link
+		// If Venmo, open link but DON'T reload (so prompt stays visible)
 		if (paymentMethod === 'venmo' && venmoUsername) {
 			const amt = amount.toFixed(2)
 			const note = encodeURIComponent(description)
@@ -135,12 +135,12 @@ export default function TransactionsTable({
 			// Open Venmo website
 			window.open(webLink, '_blank')
 			
-			// Close modal but don't reload - let user complete payment
+			// Close modal - page will stay as is, user can refresh manually
 			setSettleModal(null)
 			return
 		}
 
-		// Close modal and refresh (for manual payment)
+		// For manual payment, reload to show updated state
 		setSettleModal(null)
 		window.location.reload()
 	}

@@ -15,7 +15,7 @@ export async function DELETE(request, context) {
 	}
 }
 export async function PATCH(request, { params }) {
-	const { id } = params
+	const { id } = await params
 	const numericId = Number(id)
 	const { paid } = await request.json()
 

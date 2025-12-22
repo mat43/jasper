@@ -99,7 +99,7 @@ export default function PendingSettlementsCard({
 
 		const transactionIds = selectedPerson.transactions.map(tx => tx.id)
 
-		// Mark all expenses paid
+		// Mark all expenses paid first
 		try {
 			await Promise.all(transactionIds.map(id =>
 				fetch(`/api/expenses/${id}`, {
@@ -117,7 +117,7 @@ export default function PendingSettlementsCard({
 			return
 		}
 
-		// If Venmo and net amount is positive (I owe them), open deep link
+		// If Venmo, open link but DON'T reload (so prompt stays visible)
 		if (paymentMethod === 'venmo' && venmoUsername && selectedPerson.net > 0) {
 			const amt = Math.abs(selectedPerson.net).toFixed(2)
 			const note = encodeURIComponent(`Settlement for ${selectedPerson.transactions.length} transactions`)
@@ -126,14 +126,14 @@ export default function PendingSettlementsCard({
 			// Open Venmo website
 			window.open(webLink, '_blank')
 			
-			// Close modal but don't reload - let user complete payment
+			// Close modal - page will stay as is, user can refresh manually
 			setModalOpen(false)
 			setSelectedPerson(null)
 			setCalculated(false)
 			return
 		}
 
-		// Close modal and refresh (for manual payment)
+		// For manual payment, reload to show updated state
 		setModalOpen(false)
 		setSelectedPerson(null)
 		setCalculated(false)
