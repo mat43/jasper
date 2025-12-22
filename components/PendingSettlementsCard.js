@@ -78,7 +78,7 @@ export default function PendingSettlementsCard({
 	// Open modal and fetch Venmo username
 	async function openSettleModal(settlement) {
 		setSelectedPerson(settlement)
-		setPaymentMethod('manual')
+		setPaymentMethod('venmo')
 		setModalOpen(true)
 
 		// Fetch the user's Venmo handle
@@ -124,8 +124,15 @@ export default function PendingSettlementsCard({
 			const appLink = `venmo://paycharge?txn=pay&recipients=${venmoUsername}&amount=${amt}&note=${note}`
 			const webLink = `https://venmo.com/${venmoUsername}?txn=pay&amount=${amt}&note=${note}`
 
-			window.location.href = appLink
-			setTimeout(() => window.open(webLink, '_blank'), 500)
+			// Try to open Venmo app
+			const link = document.createElement('a')
+			link.href = appLink
+			link.click()
+			
+			// Fallback to web after a delay
+			setTimeout(() => {
+				window.open(webLink, '_blank')
+			}, 1000)
 		}
 
 		// Close modal and refresh
