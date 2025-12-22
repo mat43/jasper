@@ -121,21 +121,10 @@ export default function PendingSettlementsCard({
 		if (paymentMethod === 'venmo' && venmoUsername && selectedPerson.net > 0) {
 			const amt = Math.abs(selectedPerson.net).toFixed(2)
 			const note = encodeURIComponent(`Settlement for ${selectedPerson.transactions.length} transactions`)
-			const appLink = `venmo://paycharge?txn=pay&recipients=${venmoUsername}&amount=${amt}&note=${note}`
+			const webLink = `https://venmo.com/${venmoUsername}?txn=pay&amount=${amt}&note=${note}`
 
-			// Close modal first
-			setModalOpen(false)
-			setSelectedPerson(null)
-			setCalculated(false)
-			
-			// Open Venmo app
-			window.location = appLink
-			
-			// Reload after giving Venmo time to open
-			setTimeout(() => {
-				window.location.reload()
-			}, 1500)
-			return
+			// Open Venmo website
+			window.open(webLink, '_blank')
 		}
 
 		// Close modal and refresh
