@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 
 export async function GET(request, { params }) {
-	const { username } = params
+	const { username } = await params
 	const user = await prisma.user.findUnique({
 		where: { username },
 		select: { venmoUsername: true }

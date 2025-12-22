@@ -24,7 +24,7 @@ export default function ExpensesPage() {
 	const [newExpense, setNewExpense] = useState({
 		description: '',
 		amount: '',
-		category: 'Rent',
+		category: '',
 		assignees: [],
 		recurring: false,
 		frequency: 'monthly',   // default
@@ -130,7 +130,7 @@ export default function ExpensesPage() {
 	return (
 		// Main div for full page
 		<div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-			<h1 className="text-3xl font-semibold text-gray-800">Expenses</h1>
+			<h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-200 dark:to-purple-200 bg-clip-text text-transparent">Expenses</h1>
 
 			{/* Top row */}
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -162,18 +162,20 @@ export default function ExpensesPage() {
 				/>
 
 				{/* Spending by category */}
-				<div className="bg-white rounded-2xl shadow-lg p-4 flex flex-col space-y-4">
-					<h2 className="text-base font-semibold text-gray-900 mb-3">
+				<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-purple-500/20 dark:hover:shadow-purple-400/30 transition-all duration-300 flex flex-col space-y-4">
+					<div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/30 to-indigo-500/30 dark:from-purple-400/40 dark:to-indigo-400/40 rounded-full blur-2xl"></div>
+					
+					<h2 className="relative text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3">
 						Spending by category
 					</h2>
 
 					{/* Chart */}
-					<div className="mb-4">
+					<div className="relative mb-4">
 						<SpendingBarChart transactions={transactions} />
 					</div>
 
 					{/* Mid-size stats row */}
-					<div className="flex justify-between space-x-2">
+					<div className="relative flex justify-between space-x-2">
 						{(() => {
 							// Agg & compute
 							const totals = transactions.reduce((acc, tx) => {
@@ -186,18 +188,18 @@ export default function ExpensesPage() {
 							const avgPerCat = sumAll / (entries.length || 1)
 
 							const stats = [
-								{ icon: FiDollarSign, label: 'Total', value: `$${sumAll.toLocaleString()}`, bg: 'bg-purple-50', txt: 'text-purple-600' },
-								{ icon: FiPieChart, label: 'Top', value: `${topCat}`, bg: 'bg-indigo-50', txt: 'text-indigo-600' },
-								{ icon: FiTrendingUp, label: 'Avg', value: `$${avgPerCat.toFixed(2)}`, bg: 'bg-green-50', txt: 'text-green-600' },
+								{ icon: FiDollarSign, label: 'Total', value: `$${sumAll.toLocaleString()}`, txt: 'text-purple-600 dark:text-purple-400' },
+								{ icon: FiPieChart, label: 'Top', value: `${topCat}`, txt: 'text-indigo-600 dark:text-indigo-400' },
+								{ icon: FiTrendingUp, label: 'Avg', value: `$${avgPerCat.toFixed(2)}`, txt: 'text-emerald-600 dark:text-emerald-400' },
 							]
 
-							return stats.map(({ icon: Icon, label, value, bg, txt }) => (
+							return stats.map(({ icon: Icon, label, value, txt }) => (
 								<div key={label}
-									className={`${bg} flex-1 flex items-center p-2 rounded-lg`}>
+									className="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm flex-1 flex items-center p-2.5 rounded-xl">
 									<Icon className={`w-5 h-5 ${txt}`} />
 									<div className="ml-2">
-										<p className="text-xs text-gray-500">{label}</p>
-										<p className="text-sm font-medium text-gray-900">{value}</p>
+										<p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+										<p className="text-sm font-medium text-gray-900 dark:text-white">{value}</p>
 									</div>
 								</div>
 							))
@@ -233,10 +235,10 @@ export default function ExpensesPage() {
 				<button
 					onClick={() => setView('all')}
 					className={clsx(
-						'px-4 py-2 rounded-lg',
+						'px-4 py-2.5 rounded-xl font-medium transition-all duration-300',
 						view === 'all'
-							? 'bg-indigo-600 text-white'
-							: 'bg-gray-100 text-gray-700'
+							? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30'
+							: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
 					)}
 				>
 					All Transactions
@@ -244,10 +246,10 @@ export default function ExpensesPage() {
 				<button
 					onClick={() => setView('recurring')}
 					className={clsx(
-						'px-4 py-2 rounded-lg',
+						'px-4 py-2.5 rounded-xl font-medium transition-all duration-300',
 						view === 'recurring'
-							? 'bg-indigo-600 text-white'
-							: 'bg-gray-100 text-gray-700'
+							? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30'
+							: 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
 					)}
 				>
 					Recurring Rules
@@ -259,6 +261,7 @@ export default function ExpensesPage() {
 				<TransactionsTable
 					transactions={transactions}
 					onDelete={id => setTransactions(ts => ts.filter(t => t.id !== id))}
+					currentUser={session?.user?.username || session?.user?.name || ''}
 				/>
 			) : (
 				<RecurringRulesTable

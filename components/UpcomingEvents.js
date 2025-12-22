@@ -25,19 +25,23 @@ export default function UpcomingEvents() {
 	}, []);
 
 	return (
-		<div className="p-6 rounded-2xl shadow-lg bg-gradient-to-br from-indigo-50 to-indigo-100 flex flex-col transition-shadow duration-300 ease-in-out hover:shadow-xl">
-			<h2 className="text-lg font-semibold text-gray-800">Upcoming Events</h2>
+		<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-400/30 transition-all duration-300 flex flex-col">
+				<div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 dark:from-indigo-400/40 dark:to-purple-400/40 rounded-full blur-2xl"></div>
 
 			{loading ? (
-				<p className="mt-4 text-gray-500">Loading events...</p>
+				<p className="mt-4 text-gray-500 dark:text-gray-400">Loading...</p>
 			) : error ? (
 				<p className="mt-4 text-red-500">Error: {error}</p>
+			) : events.length === 0 ? (
+				<div className="flex-1 flex items-center justify-center">
+					<p className="text-gray-500 dark:text-gray-400 text-sm">No upcoming events</p>
+				</div>
 			) : (
-				<ul className="mt-4 space-y-2 text-gray-700 overflow-auto max-h-30">
+				<ul className="relative space-y-2 overflow-auto flex-1 max-h-64">
 					{events.map((e, i) => (
-						<li key={i} className="flex justify-between">
-							<span className="">{e.label}</span>
-							<span className="text-sm text-gray-500 ml-4 whitespace-nowrap">
+						<li key={i} className="flex justify-between items-start p-3 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/80 transition-all">
+							<span className="font-medium text-gray-900 dark:text-white flex-1 text-sm">{e.label}</span>
+							<span className="text-xs text-gray-600 dark:text-gray-400 ml-4 whitespace-nowrap">
 								{e.time}
 							</span>
 						</li>

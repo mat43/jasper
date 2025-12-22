@@ -55,7 +55,11 @@ export async function POST(request) {
 			templateId
 		} = await request.json()
 
-		// 3) create new expense record
+		// 3) check if creator is in assignees - if so, auto-mark as paid
+		const assigneesList = assignees || []
+		const creatorIsAssignee = assigneesList.includes(createdBy)
+
+		// 4) create new expense record
 		const expense = await prisma.expense.create({
 			data: {
 				description,
@@ -67,7 +71,8 @@ export async function POST(request) {
 				category,
 				assignees: JSON.stringify(assignees || []),
 				createdBy,
-				templateId: templateId || null
+				templateId: templateId || null,
+				paid: creatorIsAssignee // Auto-mark paid if creator is splitting
 			}
 		})
 

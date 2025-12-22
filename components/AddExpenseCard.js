@@ -34,6 +34,10 @@ export default function AddExpenseCard({
 			setSubmitError('Please enter both a description and an amount.')
 			return
 		}
+		if (!category) {
+			setSubmitError('Please select a category.')
+			return
+		}
 		if (recurring) {
 			if (!frequency) {
 				setSubmitError('Please select a frequency for recurring expenses.')
@@ -121,7 +125,7 @@ export default function AddExpenseCard({
 		setNewExpense({
 			description: '',
 			amount: '',
-			category: 'Rent',
+			category: '',
 			assignees: [],
 			recurring: false,
 			frequency: 'monthly',
@@ -132,19 +136,21 @@ export default function AddExpenseCard({
 	}
 
 	return (
-		<div className="bg-white rounded-2xl shadow p-6 space-y-4">
-			<h2 className="text-lg font-medium text-gray-900">Add Expense</h2>
-			{submitError && <p className="text-red-500 text-sm">{submitError}</p>}
+		<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-blue-500/20 dark:hover:shadow-blue-400/30 transition-all duration-300 space-y-4">
+			<div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-blue-500/30 to-cyan-500/30 dark:from-blue-400/40 dark:to-cyan-400/40 rounded-full blur-2xl"></div>
+			
+			<h2 className="relative text-sm font-semibold text-gray-600 dark:text-gray-400">Add Expense</h2>
+			{submitError && <p className="relative text-red-500 dark:text-red-400 text-sm">{submitError}</p>}
 
 			<input
 				type="text"
 				value={newExpense.description}
 				onChange={e => setNewExpense({ ...newExpense, description: e.target.value })}
 				placeholder="Description"
-				className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-300"
+				className="relative w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
 			/>
 
-			<div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+			<div className="relative flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
 				<input
 					type="text"
 					inputMode="decimal"
@@ -152,31 +158,32 @@ export default function AddExpenseCard({
 					value={newExpense.amount}
 					onChange={handleAmountChange}
 					onBlur={handleAmountBlur}
-					className="flex-1 min-w-0 border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-300"
+					className="flex-1 min-w-0 border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
 				/>
 				<select
 					value={newExpense.category}
 					onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
-					className="flex-1 min-w-0 border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-300"
+					className="flex-1 min-w-0 border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
 				>
+					<option value="">Select category</option>
 					{categories.map(cat => (
 						<option key={cat} value={cat}>{cat}</option>
 					))}
 				</select>
 			</div>
 
-			<div>
-				<label className="text-sm text-gray-600 block mb-1">Assign to</label>
+			<div className="relative">
+				<label className="text-sm text-gray-600 dark:text-gray-400 block mb-2 font-medium">Assign to</label>
 				<div className="flex flex-wrap gap-2">
 					{roommates.map(r => (
 						<button
 							key={r}
 							onClick={() => toggleAssignee(r)}
 							className={clsx(
-								'px-3 py-1 rounded-full text-sm font-medium',
+								'px-3 py-1.5 rounded-xl text-sm font-medium transition-all',
 								newExpense.assignees.includes(r)
-									? 'bg-purple-100 text-purple-700'
-									: 'bg-gray-100 text-gray-600'
+									? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+									: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
 							)}
 						>
 							{r}
@@ -186,7 +193,7 @@ export default function AddExpenseCard({
 			</div>
 
 			{/* Recurrence toggle */}
-			<div className="mt-4 space-y-4">
+			<div className="relative mt-4 space-y-4">
 				<div className="flex items-center space-x-2">
 					<input
 						id="recurring"
@@ -200,9 +207,9 @@ export default function AddExpenseCard({
 								...(prev.recurring ? { dayOfMonth: '', dayOfWeek: '' } : {})
 							}))
 						}
-						className="h-5 w-5 text-purple-600 border-gray-300 rounded"
+						className="h-5 w-5 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 rounded"
 					/>
-					<label htmlFor="recurring" className="text-sm font-medium text-gray-700">
+					<label htmlFor="recurring" className="text-sm font-medium text-gray-700 dark:text-gray-300">
 						Mark this recurring
 					</label>
 				</div>
@@ -210,7 +217,7 @@ export default function AddExpenseCard({
 				{newExpense.recurring && (
 					<div className="space-y-4">
 						<div>
-							<label htmlFor="frequency" className="block text-sm font-medium text-gray-700 mb-1">
+							<label htmlFor="frequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 								Frequency
 							</label>
 							<select
@@ -228,7 +235,7 @@ export default function AddExpenseCard({
 										)
 									}))
 								}}
-								className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-300"
+								className="w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
 							>
 								<option value="weekly">Weekly</option>
 								<option value="monthly">Monthly</option>
@@ -237,14 +244,14 @@ export default function AddExpenseCard({
 
 						{newExpense.frequency === 'weekly' && (
 							<div>
-								<label htmlFor="dayOfWeek" className="block text-sm font-medium text-gray-700 mb-1">
+								<label htmlFor="dayOfWeek" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 									Day of week
 								</label>
 								<select
 									id="dayOfWeek"
 									value={newExpense.dayOfWeek}
 									onChange={e => setNewExpense(prev => ({ ...prev, dayOfWeek: e.target.value }))}
-									className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-300"
+									className="w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
 								>
 									{['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
 										<option key={d} value={d.toLowerCase()}>{d}</option>
@@ -255,7 +262,7 @@ export default function AddExpenseCard({
 
 						{newExpense.frequency === 'monthly' && (
 							<div>
-								<label htmlFor="dayOfMonth" className="block text-sm font-medium text-gray-700 mb-1">
+								<label htmlFor="dayOfMonth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
 									Day of month
 								</label>
 								<input
@@ -266,7 +273,7 @@ export default function AddExpenseCard({
 									value={newExpense.dayOfMonth}
 									onChange={e => setNewExpense(prev => ({ ...prev, dayOfMonth: e.target.value }))}
 									placeholder="e.g. 2"
-									className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-300"
+									className="w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
 								/>
 							</div>
 						)}
@@ -276,7 +283,7 @@ export default function AddExpenseCard({
 
 			<button
 				onClick={submitExpense}
-				className="w-full py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-lg hover:opacity-90"
+				className="relative w-full py-3 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300"
 			>
 				Add Expense
 			</button>

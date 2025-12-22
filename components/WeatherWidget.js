@@ -57,9 +57,9 @@ export default function WeatherWidget() {
 
 	if (loading || error) {
 		return (
-			<div className="p-4 rounded-2xl shadow-md bg-gradient-to-br from-yellow-50 to-yellow-100 flex items-center justify-center">
+			<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-xl hover:shadow-yellow-500/10 dark:hover:shadow-yellow-400/20 transition-all duration-300 flex items-center justify-center min-h-[200px]">
 				{loading
-					? <p className="text-gray-500">Loading...</p>
+					? <p className="text-gray-600 dark:text-gray-400">Loading...</p>
 					: <p className="text-red-500 text-sm">Error: {error}</p>
 				}
 			</div>
@@ -75,33 +75,32 @@ export default function WeatherWidget() {
 		})
 
 	const stats = [
-		{ label: 'Humidity', value: `${humidity}%`, Icon: WiHumidity, border: 'border-l-yellow-400' },
-		{ label: 'Wind', value: `${wind} mph`, Icon: WiStrongWind, border: 'border-l-purple-500' },
-		{ label: 'Sunrise', value: toTime(sunrise), Icon: WiSunrise, border: 'border-l-orange-400' },
-		{ label: 'Sunset', value: toTime(sunset), Icon: WiSunset, border: 'border-l-blue-500' },
+		{ label: 'Humidity', value: `${humidity}%`, Icon: WiHumidity },
+		{ label: 'Wind', value: `${wind} mph`, Icon: WiStrongWind },
+		{ label: 'Sunrise', value: toTime(sunrise), Icon: WiSunrise },
+		{ label: 'Sunset', value: toTime(sunset), Icon: WiSunset },
 	]
 
 	return (
-		<div className="p-4 rounded-2xl shadow-lg bg-gradient-to-br from-yellow-50 to-yellow-100 flex flex-col transition-shadow duration-300 ease-in-out hover:shadow-xl">
-
-			{/* Header */}
-			<div className="flex items-center justify-between mb-4">
+		<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-yellow-500/20 dark:hover:shadow-yellow-400/30 transition-all duration-300 flex flex-col">
+				<div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 dark:from-yellow-400/40 dark:to-orange-400/40 rounded-full blur-2xl"></div>
+			<div className="relative flex items-center justify-between mb-4">
 				<div className="space-y-1">
-					<h2 className="text-lg mt-2 font-semibold text-gray-800">Weather</h2>
-					<p className="text-2xl font-bold text-gray-900">{temp}°F</p>
-					<p className="text-sm text-gray-600 capitalize">{description}</p>
+					<h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Weather</h2>
+					<p className="text-4xl font-bold text-gray-900 dark:text-white">{temp}°F</p>
+					<p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{description}</p>
 				</div>
-				<Icon className={`w-18 h-18 ${color}`} />
+				<Icon className={`w-20 h-20 ${color}`} />
 			</div>
 
-			{/* Stats grid with colored left borders */}
-			<div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm text-gray-700">
-				{stats.map(({ label, value, Icon: StatIcon, border }) => (
-					<div key={label} className={`flex items-center space-x-2 pl-2 ${border}`}>
-						<StatIcon className="w-5 h-5 text-gray-600" />
+			{/* Stats grid */}
+			<div className="relative grid grid-cols-2 gap-3 text-sm">
+				{stats.map(({ label, value, Icon: StatIcon }) => (
+					<div key={label} className="flex items-center space-x-2 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-2.5">
+						<StatIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
 						<div>
-							<p className="leading-tight">{label}</p>
-							<p className="font-semibold leading-tight">{value}</p>
+							<p className="text-xs text-gray-600 dark:text-gray-400">{label}</p>
+							<p className="font-semibold text-gray-900 dark:text-white">{value}</p>
 						</div>
 					</div>
 				))}

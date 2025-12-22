@@ -50,33 +50,35 @@ export default function SpendingCard() {
 	const avgTxnSize = txnCount ? (sumAll / txnCount).toFixed(2) : '0.00'
 
 	const stats = [
-		{ label: 'Total Spent', value: `$${sumAll.toLocaleString()}`, icon: FiDollarSign, bg: 'bg-orange-100', iconColor: 'text-amber-600' },
-		{ label: 'Avg / Person', value: `$${avgPerPerson}`, icon: FiUsers, bg: 'bg-indigo-100', iconColor: 'text-indigo-600' },
-		{ label: 'Transactions', value: `${txnCount}`, icon: FiList, bg: 'bg-green-100', iconColor: 'text-green-600' },
-		{ label: 'Avg Spend', value: `$${avgTxnSize}`, icon: FiActivity, bg: 'bg-pink-100', iconColor: 'text-pink-600' },
+		{ label: 'Total Spent', value: `$${sumAll.toLocaleString()}`, icon: FiDollarSign },
+		{ label: 'Avg / Person', value: `$${avgPerPerson}`, icon: FiUsers },
+		{ label: 'Transactions', value: `${txnCount}`, icon: FiList },
+		{ label: 'Avg Spend', value: `$${avgTxnSize}`, icon: FiActivity },
 	]
 
 	return (
-		<div className="row-span-2 col-span-1 p-6 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col transition-shadow duration-300 ease-in-out hover:shadow-xl">
-			<h2 className="text-lg font-semibold text-gray-800 text-center mb-4">
+		<div className="lg:row-span-2 col-span-1 group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 dark:hover:shadow-amber-400/30 transition-all duration-300 flex flex-col">
+			<div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-amber-500/30 to-orange-500/30 dark:from-amber-400/40 dark:to-orange-400/40 rounded-full blur-2xl"></div>
+			
+			<h2 className="relative text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4">
 				Spending Overview
 			</h2>
 
 			{/* Chart */}
-			<div className="w-full mb-6">
+			<div className="relative w-full mb-6">
 				<SpendingBarChart transactions={transactions} />
 			</div>
 
 			{/* Stats grid */}
-			<div className="grid grid-cols-1 gap-3">
-				{stats.map(({ label, value, icon: Icon, bg, iconColor }) => (
-					<div key={label} className={`${bg} flex items-center p-2 rounded-lg`}>
-						<div className={`${iconColor} p-1 rounded-full bg-white/70`}>
-							<Icon className="w-4 h-4" />
+			<div className="relative grid grid-cols-1 gap-3">
+				{stats.map(({ label, value, icon: Icon }) => (
+					<div key={label} className="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm flex items-center p-3 rounded-xl">
+						<div className="text-amber-600 dark:text-amber-400 p-2.5 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
+							<Icon className="w-5 h-5" />
 						</div>
-						<div className="ml-2">
-							<p className="text-xs text-gray-600 leading-tight">{label}</p>
-							<p className="text-sm font-semibold text-gray-900 leading-tight">{value}</p>
+						<div className="ml-3">
+							<p className="text-xs text-gray-600 dark:text-gray-400">{label}</p>
+							<p className="text-base font-bold text-gray-900 dark:text-white">{value}</p>
 						</div>
 					</div>
 				))}

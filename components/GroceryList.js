@@ -54,60 +54,61 @@ export default function GroceryList() {
 	};
 
 	return (
-		<div className="row-span-2 flex flex-col p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
-			{/* Header */}
-			<div className="flex justify-between items-center mb-4">
-				<h2 className="text-lg font-semibold text-gray-800">Grocery List</h2>
+		<div className="lg:row-span-2 flex flex-col group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-emerald-500/20 dark:hover:shadow-emerald-400/30 transition-all duration-300">
+				<div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-br from-emerald-500/30 to-teal-500/30 dark:from-emerald-400/40 dark:to-teal-400/40 rounded-full blur-2xl"></div>
+			<div className="relative flex justify-between items-center mb-4">
+				<h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Grocery List</h2>
 			</div>
 
 			{/* Input */}
-			<div className="flex items-center mb-4 space-x-2 min-w-0">
+			<div className="relative flex items-stretch mb-4 gap-2">
 				<input
 					type="text"
-					className="flex-1 min-w-0 px-4 py-2 bg-white border border-emerald-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-300 text-sm placeholder-gray-500"
+					className="flex-1 min-w-0 px-4 py-2.5 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm border border-gray-200/60 dark:border-gray-700/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-sm placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white"
 					value={newLabel}
 					onChange={e => setNewLabel(e.target.value)}
-					placeholder="Add new item..."
+					placeholder="Add item..."
 					disabled={adding}
+					onKeyDown={e => e.key === 'Enter' && addItem()}
 				/>
 				<button
 					onClick={addItem}
 					disabled={adding}
-					className="flex-shrink-0 p-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 transition-colors flex items-center justify-center"
+					className="flex-shrink-0 w-11 h-11 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/50 transition-all duration-300 flex items-center justify-center"
 				>
 					<FiPlus className="w-5 h-5" />
 				</button>
 			</div>
 
 			{/* Scrollable list */}
-			<div className="flex-1 overflow-y-auto max-h-76">
+			<div className="relative flex-1 overflow-y-auto">
 				{loading ? (
-					<p className="text-center text-gray-500">Loading grocery list...</p>
+					<p className="text-center text-gray-500 dark:text-gray-400 py-4">Loading...</p>
 				) : error ? (
-					<p className="text-center text-red-500">Error: {error}</p>
+					<p className="text-center text-red-500 py-4">Error: {error}</p>
 				) : (
 					<ul className="space-y-2">
 						{items.map(({ id, label, done, assignedTo }) => (
 							<li
 								key={id}
-								className="flex justify-between items-center p-3 bg-white bg-opacity-50 rounded-lg hover:bg-opacity-70 transition-colors"
+								className="flex justify-between items-center p-3 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl hover:bg-gray-100/80 dark:hover:bg-gray-700/80 transition-all"
 							>
-								<div className="flex items-center space-x-3">
+								<div className="flex items-center space-x-3 flex-1 min-w-0">
 									<button
 										onClick={() => toggleDone(id, done)}
-										className="p-1 bg-white rounded-full hover:bg-emerald-100 transition-colors flex-shrink-0"
+										className="flex-shrink-0 p-1.5 bg-white dark:bg-gray-900 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
 									>
-										<FiCheck className={`w-5 h-5 ${done ? 'text-green-500' : 'text-gray-300'}`} />
+										<FiCheck className={`w-4 h-4 ${done ? 'text-emerald-500' : 'text-gray-300 dark:text-gray-600'}`} />
 									</button>
-									<div>
-										<div className={`${done ? 'line-through text-gray-400' : 'text-gray-800 font-medium'}`}>{label}</div>
+									<div className="flex-1 min-w-0">
+										<div className={`text-sm ${done ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white font-medium'}`}>{label}</div>
 									</div>
 								</div>
 								<button
 									onClick={() => deleteItem(id)}
-									className="p-1 bg-white rounded-full hover:bg-red-50 transition-colors flex-shrink-0"
+									className="flex-shrink-0 p-1.5 bg-white dark:bg-gray-900 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
 								>
-									<FiTrash2 className="w-5 h-5 text-red-400 hover:text-red-600" />
+									<FiTrash2 className="w-4 h-4 text-red-500" />
 								</button>
 							</li>
 						))}

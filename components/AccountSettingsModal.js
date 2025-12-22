@@ -76,7 +76,7 @@ export default function AccountSettingsModal({ user, onClose }) {
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.2 }}
-					className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/10"
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 					onClick={handleClose}
 				>
 					<motion.form
@@ -85,27 +85,30 @@ export default function AccountSettingsModal({ user, onClose }) {
 						animate={{ scale: 1, opacity: 1 }}
 						exit={{ scale: 0.95, opacity: 0 }}
 						transition={{ duration: 0.2 }}
-						className="bg-white/90 rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl"
+						className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-indigo-200/60 dark:border-indigo-800/60 rounded-3xl shadow-2xl p-8 w-full max-w-md mx-4"
 						onClick={e => e.stopPropagation()}
 						onSubmit={handleSubmit}
 					>
-						<h2 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
+						{/* Gradient Orb */}
+						<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
+						
+						<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">
 							Account Settings
 						</h2>
 
 						{error && (
-							<div className="mb-4 w-full rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-800 shadow-sm text-center">
+							<div className="relative mb-4 w-full rounded-lg border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/50 px-4 py-2 text-sm text-red-800 dark:text-red-400 shadow-sm text-center">
 								{error}
 							</div>
 						)}
 
 						{/* Avatar upload */}
-						<div className="flex flex-col items-center mb-6">
+						<div className="relative flex flex-col items-center mb-6">
 							<div className="relative w-24 h-24">
 								<img
 									src={avatarPreview}
 									alt="Avatar preview"
-									className="w-full h-full object-cover rounded-full ring-2 ring-indigo-200"
+									className="w-full h-full object-cover rounded-full ring-4 ring-indigo-200/50 dark:ring-indigo-800/50 shadow-lg"
 								/>
 								<input
 									type="file"
@@ -113,88 +116,88 @@ export default function AccountSettingsModal({ user, onClose }) {
 									onChange={handleAvatarChange}
 									className="absolute inset-0 w-full h-full opacity-0 cursor-pointer rounded-full"
 								/>
-								<div className="absolute bottom-1 right-1 bg-white p-1 rounded-full shadow">
-									<CameraIcon className="w-5 h-5 text-indigo-600" />
+									<div className="absolute bottom-1 right-1 bg-gradient-to-br from-indigo-500 to-purple-500 p-2 rounded-full shadow-lg">
+										<CameraIcon className="w-4 h-4 text-white" />
+									</div>
 								</div>
-							</div>
-							<span className="mt-2 text-sm text-gray-700">Change Avatar</span>
+								<span className="mt-2 text-sm text-gray-700 dark:text-gray-300">Change Avatar</span>
 						</div>
 
-						<label className="block mb-4">
-							<span className="text-gray-700">Username</span>
+						<label className="relative block mb-4">
+							<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Username</span>
 							<input
 								type="text"
 								value={user.username}
 								readOnly
-								className="mt-1 block w-full rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-gray-700"
+								className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800/50 px-3 py-2 text-gray-700 dark:text-gray-300"
 							/>
 						</label>
 
-						<div className="flex gap-4 mb-4">
+						<div className="relative flex gap-4 mb-4">
 							<label className="flex-1">
-								<span className="text-gray-700">First Name</span>
+								<span className="text-sm font-medium text-gray-700 dark:text-gray-300">First Name</span>
 								<input
 									type="text"
 									value={firstName}
 									onChange={e => setFirstName(e.target.value)}
-									className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700"
+									className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
 								/>
 							</label>
 							<label className="flex-1">
-								<span className="text-gray-700">Last Name</span>
+								<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</span>
 								<input
 									type="text"
 									value={lastName}
 									onChange={e => setLastName(e.target.value)}
-									className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700"
+									className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
 								/>
 							</label>
 						</div>
 
-						<label className="block mb-4">
-							<span className="text-gray-700">Email</span>
+						<label className="relative block mb-4">
+							<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</span>
 							<input
 								type="email"
 								value={email}
 								onChange={e => setEmail(e.target.value)}
-								className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700"
+								className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
 							/>
 						</label>
 
-						<label className="block mb-4">
-							<span className="text-gray-700">Venmo Username</span>
+						<label className="relative block mb-4">
+							<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Venmo Username</span>
 							<input
 								type="text"
 								value={venmo}
 								onChange={e => setVenmo(e.target.value)}
-								className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700"
+								className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
 							/>
 						</label>
 
-						<div className="flex gap-4 mb-6">
+						<div className="relative flex gap-4 mb-6">
 							<label className="flex-1">
-								<span className="text-gray-700">New Password</span>
+								<span className="text-sm font-medium text-gray-700 dark:text-gray-300">New Password</span>
 								<input
 									type="password"
 									value={password}
 									onChange={e => setPassword(e.target.value)}
-									className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700"
+									className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
 								/>
 							</label>
 							<label className="flex-1">
-								<span className="text-gray-700">Confirm Password</span>
+								<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</span>
 								<input
 									type="password"
 									value={confirm}
 									onChange={e => setConfirm(e.target.value)}
-									className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-700"
+									className="mt-1 block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 px-3 py-2 text-gray-700 dark:text-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
 								/>
 							</label>
 						</div>
 
 						<button
 							type="submit"
-							className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+							className="relative w-full px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-xl transition-all"
 						>
 							Save Changes
 						</button>
