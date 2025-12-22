@@ -134,9 +134,13 @@ export default function TransactionsTable({
 
 			// Open Venmo website
 			window.open(webLink, '_blank')
+			
+			// Close modal but don't reload - let user complete payment
+			setSettleModal(null)
+			return
 		}
 
-		// Close modal and refresh
+		// Close modal and refresh (for manual payment)
 		setSettleModal(null)
 		window.location.reload()
 	}

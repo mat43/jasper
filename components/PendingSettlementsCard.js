@@ -125,9 +125,15 @@ export default function PendingSettlementsCard({
 
 			// Open Venmo website
 			window.open(webLink, '_blank')
+			
+			// Close modal but don't reload - let user complete payment
+			setModalOpen(false)
+			setSelectedPerson(null)
+			setCalculated(false)
+			return
 		}
 
-		// Close modal and refresh
+		// Close modal and refresh (for manual payment)
 		setModalOpen(false)
 		setSelectedPerson(null)
 		setCalculated(false)
