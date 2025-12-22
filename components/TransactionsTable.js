@@ -131,17 +131,18 @@ export default function TransactionsTable({
 			const amt = amount.toFixed(2)
 			const note = encodeURIComponent(description)
 			const appLink = `venmo://paycharge?txn=pay&recipients=${venmoUsername}&amount=${amt}&note=${note}`
-			const webLink = `https://venmo.com/${venmoUsername}?txn=pay&amount=${amt}&note=${note}`
 
-			// Try to open Venmo app
-			const link = document.createElement('a')
-			link.href = appLink
-			link.click()
+			// Close modal first
+			setSettleModal(null)
 			
-			// Fallback to web after a delay
+			// Open Venmo app
+			window.location = appLink
+			
+			// Reload after giving Venmo time to open
 			setTimeout(() => {
-				window.open(webLink, '_blank')
-			}, 1000)
+				window.location.reload()
+			}, 1500)
+			return
 		}
 
 		// Close modal and refresh
