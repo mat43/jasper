@@ -15,6 +15,10 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+ARG NEXTAUTH_SECRET
+ARG NEXTAUTH_URL
+ENV NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+ENV NEXTAUTH_URL=$NEXTAUTH_URL
 # Build Next.js app
 RUN npm run build
 
