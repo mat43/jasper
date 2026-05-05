@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
-@variant dark (.dark &);
-
 @layer base {
   body {
     @apply antialiased;
+    background-color: #f8fafc;
+    background-image:
+      linear-gradient(rgba(59, 130, 246, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.07) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 }
 
@@ -19,11 +22,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  @apply bg-gray-300 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  @apply bg-gray-400;
 }
 
 /* Modal Animations */

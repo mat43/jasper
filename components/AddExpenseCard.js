@@ -136,21 +136,19 @@ export default function AddExpenseCard({
 	}
 
 	return (
-		<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-blue-500/20 dark:hover:shadow-blue-400/30 transition-all duration-300 space-y-4">
-			<div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-blue-500/30 to-cyan-500/30 dark:from-blue-400/40 dark:to-cyan-400/40 rounded-full blur-2xl"></div>
-			
-			<h2 className="relative text-sm font-semibold text-gray-600 dark:text-gray-400">Add Expense</h2>
-			{submitError && <p className="relative text-red-500 dark:text-red-400 text-sm">{submitError}</p>}
+		<div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200 space-y-4">
+			<p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Add Expense</p>
+			{submitError && <p className="text-red-500 text-sm">{submitError}</p>}
 
 			<input
 				type="text"
 				value={newExpense.description}
 				onChange={e => setNewExpense({ ...newExpense, description: e.target.value })}
 				placeholder="Description"
-				className="relative w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+				className="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-gray-900 placeholder-gray-400"
 			/>
 
-			<div className="relative flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+			<div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
 				<input
 					type="text"
 					inputMode="decimal"
@@ -158,12 +156,12 @@ export default function AddExpenseCard({
 					value={newExpense.amount}
 					onChange={handleAmountChange}
 					onBlur={handleAmountBlur}
-					className="flex-1 min-w-0 border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+					className="flex-1 min-w-0 border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-gray-900 placeholder-gray-400"
 				/>
 				<select
 					value={newExpense.category}
 					onChange={e => setNewExpense({ ...newExpense, category: e.target.value })}
-					className="flex-1 min-w-0 border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+					className="flex-1 min-w-0 border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-gray-900"
 				>
 					<option value="">Select category</option>
 					{categories.map(cat => (
@@ -172,28 +170,28 @@ export default function AddExpenseCard({
 				</select>
 			</div>
 
-			<div className="relative">
-				<label className="text-sm text-gray-600 dark:text-gray-400 block mb-2 font-medium">Assign to</label>
+			<div>
+				<label className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-2">Assign to</label>
 				<div className="flex flex-wrap gap-2">
 					{roommates.map(r => (
 						<button
-							key={r}
-							onClick={() => toggleAssignee(r)}
+							key={r.username}
+							onClick={() => toggleAssignee(r.username)}
 							className={clsx(
-								'px-3 py-1.5 rounded-xl text-sm font-medium transition-all',
-								newExpense.assignees.includes(r)
-									? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-									: 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+								'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150',
+								newExpense.assignees.includes(r.username)
+									? 'bg-blue-100 text-blue-700'
+									: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
 							)}
 						>
-							{r}
+							{r.name?.split(' ')[0] ?? r.username}
 						</button>
 					))}
 				</div>
 			</div>
 
 			{/* Recurrence toggle */}
-			<div className="relative mt-4 space-y-4">
+			<div className="mt-4 space-y-4">
 				<div className="flex items-center space-x-2">
 					<input
 						id="recurring"
@@ -203,13 +201,12 @@ export default function AddExpenseCard({
 							setNewExpense(prev => ({
 								...prev,
 								recurring: !prev.recurring,
-								// clear the old day if turning off
 								...(prev.recurring ? { dayOfMonth: '', dayOfWeek: '' } : {})
 							}))
 						}
-						className="h-5 w-5 text-blue-600 dark:text-blue-400 border-gray-300 dark:border-gray-600 rounded"
+						className="h-5 w-5 text-blue-600 border-gray-300 rounded"
 					/>
-					<label htmlFor="recurring" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+					<label htmlFor="recurring" className="text-sm font-medium text-gray-700">
 						Mark this recurring
 					</label>
 				</div>
@@ -217,25 +214,24 @@ export default function AddExpenseCard({
 				{newExpense.recurring && (
 					<div className="space-y-4">
 						<div>
-							<label htmlFor="frequency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-								Frequency
-							</label>
-							<select
-								id="frequency"
-								value={newExpense.frequency}
-								onChange={e => {
-									const freq = e.target.value
-									setNewExpense(prev => ({
-										...prev,
-										frequency: freq,
-										// when switching to weekly/monthly, default the day fields
-										...(freq === 'weekly'
-											? { dayOfWeek: prev.dayOfWeek || 'sunday', dayOfMonth: '' }
-											: { dayOfMonth: prev.dayOfMonth || '1', dayOfWeek: '' }
-										)
-									}))
-								}}
-								className="w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+						<label htmlFor="frequency" className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+							Frequency
+						</label>
+						<select
+							id="frequency"
+							value={newExpense.frequency}
+							onChange={e => {
+								const freq = e.target.value
+								setNewExpense(prev => ({
+									...prev,
+									frequency: freq,
+									...(freq === 'weekly'
+										? { dayOfWeek: prev.dayOfWeek || 'sunday', dayOfMonth: '' }
+										: { dayOfMonth: prev.dayOfMonth || '1', dayOfWeek: '' }
+									)
+								}))
+							}}
+							className="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-gray-900"
 							>
 								<option value="weekly">Weekly</option>
 								<option value="monthly">Monthly</option>
@@ -244,14 +240,14 @@ export default function AddExpenseCard({
 
 						{newExpense.frequency === 'weekly' && (
 							<div>
-								<label htmlFor="dayOfWeek" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+								<label htmlFor="dayOfWeek" className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
 									Day of week
 								</label>
 								<select
 									id="dayOfWeek"
 									value={newExpense.dayOfWeek}
 									onChange={e => setNewExpense(prev => ({ ...prev, dayOfWeek: e.target.value }))}
-									className="w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white"
+									className="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-gray-900"
 								>
 									{['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(d => (
 										<option key={d} value={d.toLowerCase()}>{d}</option>
@@ -262,7 +258,7 @@ export default function AddExpenseCard({
 
 						{newExpense.frequency === 'monthly' && (
 							<div>
-								<label htmlFor="dayOfMonth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+								<label htmlFor="dayOfMonth" className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
 									Day of month
 								</label>
 								<input
@@ -273,7 +269,7 @@ export default function AddExpenseCard({
 									value={newExpense.dayOfMonth}
 									onChange={e => setNewExpense(prev => ({ ...prev, dayOfMonth: e.target.value }))}
 									placeholder="e.g. 2"
-									className="w-full border border-gray-200/60 dark:border-gray-700/60 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500/50 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+									className="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-400/50 text-gray-900 placeholder-gray-400"
 								/>
 							</div>
 						)}
@@ -283,7 +279,7 @@ export default function AddExpenseCard({
 
 			<button
 				onClick={submitExpense}
-				className="relative w-full py-3 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 hover:from-blue-700 hover:via-cyan-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300"
+				className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors duration-150"
 			>
 				Add Expense
 			</button>

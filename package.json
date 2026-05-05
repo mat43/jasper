@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start -p 4278",
     "lint": "next lint",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -26,17 +28,21 @@
     "framer-motion": "^12.9.4",
     "headlessui": "^0.0.0",
     "lucide-react": "^0.507.0",
-    "next": "15.3.1",
+    "next": "^15.3.4",
     "next-auth": "^4.24.11",
+    "preact": "^10.29.1",
     "prisma": "^6.7.0",
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "dotenv": "^17.4.2",
+    "tailwindcss": "^4",
+    "vitest": "^4.1.5"
   }
 }

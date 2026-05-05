@@ -1,87 +1,58 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import prisma from '@/lib/prisma'
+import { requireAuth, parseBody, logError } from '@/lib/auth'
+import { createExpenseSchema } from '@/lib/schemas'
 
-export async function GET(request) {
-	try {
-		// 1) fetch raw expenses
-		const expenses = await prisma.expense.findMany({
-			orderBy: { createdAt: 'desc' }
-		})
+function normalizeAssignees(raw) {
+  try {
+    const parsed = JSON.parse(raw || '[]')
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
 
-		// 2) normalize assignees field to always be an array
-		const normalized = expenses.map(e => {
-			let list = []
-			if (Array.isArray(e.assignees)) {
-				list = e.assignees
-			} else {
-				try {
-					list = JSON.parse(e.assignees || '[]')
-					if (!Array.isArray(list)) list = []
-				} catch {
-					list = []
-				}
-			}
-			return {
-				...e,
-				assignees: list
-			}
-		})
+export async function GET() {
+  const { unauth } = await requireAuth()
+  if (unauth) return unauth
 
-		// 3) return normalized payload
-		return NextResponse.json(normalized, { status: 200 })
-	} catch (error) {
-		console.error('Error fetching expenses:', error)
-		return NextResponse.json(
-			{ error: 'Failed to fetch expenses' },
-			{ status: 500 }
-		)
-	}
+  try {
+    const expenses = await prisma.expense.findMany({ orderBy: { createdAt: 'desc' } })
+    return NextResponse.json(
+      expenses.map(e => ({ ...e, assignees: normalizeAssignees(e.assignees) })),
+      { status: 200 }
+    )
+  } catch (err) {
+    logError('GET /api/expenses', err)
+    return NextResponse.json({ error: 'Failed to fetch expenses' }, { status: 500 })
+  }
 }
 
 export async function POST(request) {
-	try {
-		// 1) get current user from session
-		const session = await getServerSession(authOptions)
-		const createdBy = session?.user?.username || 'Unknown'
+  const { session, unauth } = await requireAuth()
+  if (unauth) return unauth
 
-		// 2) parse body
-		const {
-			description,
-			amount,
-			category,
-			assignees,
-			templateId
-		} = await request.json()
+  const { data, bodyError } = await parseBody(request, createExpenseSchema)
+  if (bodyError) return bodyError
 
-		// 3) check if creator is in assignees - if so, auto-mark as paid
-		const assigneesList = assignees || []
-		const creatorIsAssignee = assigneesList.includes(createdBy)
-
-		// 4) create new expense record
-		const expense = await prisma.expense.create({
-			data: {
-				description,
-				amount: parseFloat(
-					typeof amount === 'string'
-						? amount.replace(/[^0-9.-]+/g, '')
-						: amount
-				),
-				category,
-				assignees: JSON.stringify(assignees || []),
-				createdBy,
-				templateId: templateId || null,
-				paid: creatorIsAssignee // Auto-mark paid if creator is splitting
-			}
-		})
-
-		return NextResponse.json(expense, { status: 201 })
-	} catch (error) {
-		console.error('Error adding expense:', error)
-		return NextResponse.json(
-			{ error: 'Failed to add expense' },
-			{ status: 500 }
-		)
-	}
+  try {
+    const { description, amount, category, assignees, templateId } = data
+    const createdBy = session.user.username
+    const expense = await prisma.expense.create({
+      data: {
+        description,
+        amount,
+        category,
+        assignees:  JSON.stringify(assignees),
+        createdBy,
+        templateId: templateId ?? null,
+        paid:       assignees.includes(createdBy),
+      },
+    })
+    return NextResponse.json({ ...expense, assignees }, { status: 201 })
+  } catch (err) {
+    logError('POST /api/expenses', err)
+    return NextResponse.json({ error: 'Failed to add expense' }, { status: 500 })
+  }
 }
+

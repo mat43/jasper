@@ -142,48 +142,46 @@ export default function PendingSettlementsCard({
 
 	return (
 		<>
-		<div className="lg:row-span-2 group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-indigo-500/20 dark:hover:shadow-indigo-400/30 transition-all duration-300 flex flex-col min-h-72">
-			<div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-br from-indigo-500/30 to-purple-500/30 dark:from-indigo-400/40 dark:to-purple-400/40 rounded-full blur-2xl"></div>
-			
-			<div className="relative flex items-center justify-between mb-4">
-				<h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Net Settlements</h2>
+		<div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200 flex flex-col min-h-72">
+			<div className="flex items-center justify-between mb-4">
+				<p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Net Settlements</p>
 				{calculated && (
 					<button
 						onClick={() => setCalculated(false)}
-						className="p-2 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 rounded-lg transition-colors group/btn"
+						className="p-2 hover:bg-gray-100 rounded-lg transition-colors group/btn"
 						title="Recalculate"
 					>
-						<RotateCcw className="w-4 h-4 text-indigo-600 dark:text-indigo-400 group-hover/btn:rotate-180 transition-transform duration-500" />
+						<RotateCcw className="w-4 h-4 text-gray-500 group-hover/btn:rotate-180 transition-transform duration-500" />
 					</button>
 				)}
 			</div>
 			
 			{!calculated ? (
-				<div className="relative flex-1 flex flex-col items-center justify-center">
-					<Calculator className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-					<p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-center">
+				<div className="flex-1 flex flex-col items-center justify-center">
+					<Calculator className="w-14 h-14 text-gray-200 mb-4" />
+					<p className="text-sm text-gray-400 mb-4 text-center">
 						Calculate net amounts owed per person
 					</p>
 					<button
 						onClick={calculateSettlements}
-						className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-300"
+						className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-colors duration-150"
 					>
 						Calculate Settlements
 					</button>
 				</div>
 			) : (
-				<div className="relative bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 space-y-3 overflow-y-auto flex-1 max-h-80">
+				<div className="bg-gray-50 rounded-xl p-4 space-y-3 overflow-y-auto flex-1 max-h-80">
 					{settlements.length === 0 ? (
-						<p className="text-center text-gray-500 dark:text-gray-400 py-8">All settled up! 🎉</p>
+						<p className="text-center text-gray-400 py-8">All settled up!</p>
 					) : (
 						settlements.map(settlement => (
 							<div key={settlement.person}>
-								<div className="flex justify-between items-center p-3 bg-white dark:bg-gray-900 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all">
+								<div className="flex justify-between items-center p-3 bg-white border border-gray-100 rounded-xl hover:border-gray-200 transition-colors">
 									<div className="flex-1">
-										<p className="text-gray-800 dark:text-white font-medium">{settlement.person}</p>
+										<p className="text-gray-800 font-medium">{settlement.person}</p>
 										<button
 											onClick={() => setExpandedPerson(expandedPerson === settlement.person ? null : settlement.person)}
-											className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 mt-1"
+											className="text-xs text-indigo-500 hover:underline flex items-center gap-1 mt-1"
 										>
 											{settlement.transactions.length} transaction{settlement.transactions.length !== 1 ? 's' : ''}
 											{expandedPerson === settlement.person ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
@@ -191,17 +189,17 @@ export default function PendingSettlementsCard({
 									</div>
 									<div className="flex items-center space-x-4">
 										<div className="text-right">
-											<span className={`text-lg font-bold ${settlement.net > 0 ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400'}`}>
+											<span className={`text-lg font-bold ${settlement.net > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
 												{settlement.net > 0 ? '-' : '+'}${Math.abs(settlement.net).toFixed(2)}
 											</span>
-											<p className="text-xs text-gray-500 dark:text-gray-400">
+											<p className="text-xs text-gray-400">
 												{settlement.net > 0 ? 'You owe' : 'They owe you'}
 											</p>
 										</div>
 										{settlement.net > 0 && (
 											<button
 												onClick={() => openSettleModal(settlement)}
-												className="px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-sm font-medium shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-300"
+												className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors duration-150"
 											>
 												Settle
 											</button>
@@ -209,13 +207,12 @@ export default function PendingSettlementsCard({
 									</div>
 								</div>
 								
-								{/* Expanded transaction list */}
 								{expandedPerson === settlement.person && (
 									<div className="mt-2 ml-4 space-y-1">
 										{settlement.transactions.map(tx => (
-											<div key={tx.id} className="text-xs p-2 bg-gray-100 dark:bg-gray-800 rounded-lg flex justify-between">
-												<span className="text-gray-600 dark:text-gray-400">{tx.description}</span>
-												<span className={`font-medium ${tx.type === 'owe' ? 'text-red-500' : 'text-green-500'}`}>
+											<div key={tx.id} className="text-xs p-2 bg-gray-100 rounded-lg flex justify-between">
+												<span className="text-gray-500">{tx.description}</span>
+												<span className={`font-medium ${tx.type === 'owe' ? 'text-red-500' : 'text-emerald-500'}`}>
 													${tx.amount.toFixed(2)}
 												</span>
 											</div>
@@ -231,38 +228,35 @@ export default function PendingSettlementsCard({
 
 		{/* Settlement Modal */}
 		{modalOpen && selectedPerson && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-					<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200/60 dark:border-gray-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
-						{/* Gradient Orb */}
-						<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
-						
+				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+					<div className="relative w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
 						{/* Close Button */}
 						<button
 							onClick={() => setModalOpen(false)}
-							className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-10"
+							className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
 						>
-							<X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+							<X className="w-5 h-5 text-gray-500" />
 						</button>
 
 						{/* Title */}
-						<h2 className="relative text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">
+						<h2 className="text-xl font-bold text-gray-900 mb-6">
 							Settle Net Balance
 						</h2>
 
 						{/* Settlement Details */}
-						<div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-2xl p-5 mb-4 border border-indigo-200/50 dark:border-indigo-800/50">
+						<div className="bg-gray-50 rounded-xl p-5 mb-4">
 							<div className="flex justify-between items-center mb-2">
-								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">Net Amount</span>
-								<span className="text-3xl font-bold text-red-600 dark:text-red-400">
+								<span className="text-sm text-gray-500">Net Amount</span>
+								<span className="text-3xl font-bold text-red-500">
 									${Math.abs(selectedPerson.net).toFixed(2)}
 								</span>
 							</div>
 							<div className="flex justify-between items-center text-sm mb-2">
-								<span className="text-gray-600 dark:text-gray-400">Pay to</span>
-								<span className="font-semibold text-gray-900 dark:text-white">{selectedPerson.person}</span>
+								<span className="text-gray-500">Pay to</span>
+								<span className="font-semibold text-gray-900">{selectedPerson.person}</span>
 							</div>
-							<div className="mt-2 pt-2 border-t border-indigo-200/50 dark:border-indigo-800/50 text-xs">
-								<div className="flex justify-between text-gray-500 dark:text-gray-400">
+							<div className="mt-2 pt-2 border-t border-gray-200 text-xs">
+								<div className="flex justify-between text-gray-400">
 									<span>You owe: ${selectedPerson.owe.toFixed(2)}</span>
 									<span>They owe: ${selectedPerson.owed.toFixed(2)}</span>
 								</div>
@@ -270,32 +264,32 @@ export default function PendingSettlementsCard({
 						</div>
 
 						{/* Transaction List */}
-						<div className="relative mb-6">
-							<p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+						<div className="mb-6">
+							<p className="text-sm font-semibold text-gray-700 mb-2">
 								Settling {selectedPerson.transactions.length} transaction{selectedPerson.transactions.length !== 1 ? 's' : ''}:
 							</p>
-							<div className="max-h-32 overflow-y-auto space-y-1 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+							<div className="max-h-32 overflow-y-auto space-y-1 bg-gray-50 rounded-lg p-3">
 								{selectedPerson.transactions.map(tx => (
 									<div key={tx.id} className="text-xs flex justify-between items-center">
-										<span className="text-gray-600 dark:text-gray-400">{tx.description}</span>
-										<span className="font-medium text-gray-800 dark:text-gray-200">${tx.amount.toFixed(2)}</span>
+										<span className="text-gray-500">{tx.description}</span>
+										<span className="font-medium text-gray-700">${tx.amount.toFixed(2)}</span>
 									</div>
 								))}
 							</div>
 						</div>
 
 						{/* Payment Options */}
-						<div className="relative space-y-3 mb-6">
-							<h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Choose Payment Method</h3>
+						<div className="space-y-3 mb-6">
+							<h3 className="text-sm font-semibold text-gray-700 mb-3">Choose Payment Method</h3>
 
 							{/* Venmo Option */}
 							{venmoUsername && (
-								<label className={`block cursor-pointer transition-all ${
-									paymentMethod === 'venmo' 
-										? 'ring-2 ring-indigo-500 dark:ring-indigo-400' 
-										: 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+								<label className={`block cursor-pointer rounded-xl border transition-colors ${
+									paymentMethod === 'venmo'
+										? 'border-indigo-400 bg-indigo-50'
+										: 'border-gray-200 hover:bg-gray-50'
 								}`}>
-									<div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+									<div className="p-4">
 										<div className="flex items-start gap-3">
 											<input
 												type="radio"
@@ -306,13 +300,11 @@ export default function PendingSettlementsCard({
 												className="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500"
 											/>
 											<div className="flex-1">
-												<div className="font-semibold text-gray-900 dark:text-white mb-1">
-													Pay with Venmo
+												<div className="font-semibold text-gray-900 mb-1">Pay with Venmo</div>
+												<div className="text-sm text-gray-500">
+													Venmo: <span className="font-medium text-indigo-600">@{venmoUsername}</span>
 												</div>
-												<div className="text-sm text-gray-600 dark:text-gray-400">
-													Venmo: <span className="font-medium text-indigo-600 dark:text-indigo-400">@{venmoUsername}</span>
-												</div>
-												<p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+												<p className="text-xs text-gray-400 mt-2">
 													Opens Venmo app with pre-filled payment details
 												</p>
 											</div>
@@ -322,12 +314,12 @@ export default function PendingSettlementsCard({
 							)}
 
 							{/* Manual Option */}
-							<label className={`block cursor-pointer transition-all ${
-								paymentMethod === 'manual' 
-									? 'ring-2 ring-indigo-500 dark:ring-indigo-400' 
-									: 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+							<label className={`block cursor-pointer rounded-xl border transition-colors ${
+								paymentMethod === 'manual'
+									? 'border-indigo-400 bg-indigo-50'
+									: 'border-gray-200 hover:bg-gray-50'
 							}`}>
-								<div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+								<div className="p-4">
 									<div className="flex items-start gap-3">
 										<input
 											type="radio"
@@ -338,10 +330,8 @@ export default function PendingSettlementsCard({
 											className="mt-1 w-4 h-4 text-indigo-600 focus:ring-indigo-500"
 										/>
 										<div className="flex-1">
-											<div className="font-semibold text-gray-900 dark:text-white mb-1">
-												Handle payment on your own
-											</div>
-											<p className="text-sm text-gray-600 dark:text-gray-400">
+											<div className="font-semibold text-gray-900 mb-1">Handle payment on your own</div>
+											<p className="text-sm text-gray-500">
 												Pay using cash, check, bank transfer, or any other method. Click "Proceed" below when complete.
 											</p>
 										</div>
@@ -351,16 +341,16 @@ export default function PendingSettlementsCard({
 						</div>
 
 						{/* Action Buttons */}
-						<div className="relative flex gap-3">
+						<div className="flex gap-3">
 							<button
 								onClick={handleProceed}
-								className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-300"
+								className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-colors duration-150"
 							>
 								Proceed
 							</button>
 							<button
 								onClick={() => setModalOpen(false)}
-								className="px-6 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-all duration-300"
+								className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors duration-150"
 							>
 								Cancel
 							</button>

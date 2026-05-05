@@ -10,18 +10,25 @@ import {
 import SpendingBarChart from './SpendingBarChart'
 
 export default function SpendingCard() {
-	const roommates = ['Mathew', 'Brycen', 'Nathan', 'Michael']
+	const [users, setUsers] = useState([])
 	const [transactions, setTransactions] = useState([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState(null)
 
 	useEffect(() => {
-		async function fetchExpenses() {
+		async function fetchData() {
 			try {
-				const res = await fetch('/api/expenses')
-				const data = await res.json()
-				if (!res.ok) throw new Error(data.message || `Error ${res.status}`)
-				setTransactions(data)
+				const [expRes, usrRes] = await Promise.all([
+					fetch('/api/expenses'),
+					fetch('/api/users'),
+				])
+				const [expData, usrData] = await Promise.all([
+					expRes.json(),
+					usrRes.json(),
+				])
+				if (!expRes.ok) throw new Error(expData.message || `Error ${expRes.status}`)
+				setTransactions(expData)
+				setUsers(usrData)
 			} catch (err) {
 				console.error(err)
 				setError(err.message)
@@ -29,7 +36,7 @@ export default function SpendingCard() {
 				setLoading(false)
 			}
 		}
-		fetchExpenses()
+		fetchData()
 	}, [])
 
 	if (loading) return <p>Loading…</p>
@@ -46,7 +53,7 @@ export default function SpendingCard() {
 	// basic stats
 	const sumAll = allTxns.reduce((sum, tx) => sum + tx.amount, 0)
 	const txnCount = allTxns.length
-	const avgPerPerson = (sumAll / roommates.length).toFixed(2)
+	const avgPerPerson = users.length ? (sumAll / users.length).toFixed(2) : '0.00'
 	const avgTxnSize = txnCount ? (sumAll / txnCount).toFixed(2) : '0.00'
 
 	const stats = [
@@ -57,12 +64,8 @@ export default function SpendingCard() {
 	]
 
 	return (
-		<div className="lg:row-span-2 col-span-1 group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 dark:hover:shadow-amber-400/30 transition-all duration-300 flex flex-col">
-			<div className="absolute top-0 left-0 w-40 h-40 bg-gradient-to-br from-amber-500/30 to-orange-500/30 dark:from-amber-400/40 dark:to-orange-400/40 rounded-full blur-2xl"></div>
-			
-			<h2 className="relative text-sm font-semibold text-gray-600 dark:text-gray-400 mb-4">
-				Spending Overview
-			</h2>
+		<div className="lg:row-span-2 col-span-1 bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200 flex flex-col">
+			<p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Spending Overview</p>
 
 			{/* Chart */}
 			<div className="relative w-full mb-6">
@@ -70,15 +73,15 @@ export default function SpendingCard() {
 			</div>
 
 			{/* Stats grid */}
-			<div className="relative grid grid-cols-1 gap-3">
+			<div className="grid grid-cols-1 gap-2">
 				{stats.map(({ label, value, icon: Icon }) => (
-					<div key={label} className="bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm flex items-center p-3 rounded-xl">
-						<div className="text-amber-600 dark:text-amber-400 p-2.5 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
-							<Icon className="w-5 h-5" />
+					<div key={label} className="bg-gray-50 flex items-center p-3 rounded-xl">
+						<div className="text-amber-500 p-2 rounded-lg bg-amber-50">
+							<Icon className="w-4 h-4" />
 						</div>
 						<div className="ml-3">
-							<p className="text-xs text-gray-600 dark:text-gray-400">{label}</p>
-							<p className="text-base font-bold text-gray-900 dark:text-white">{value}</p>
+							<p className="text-xs text-gray-400">{label}</p>
+							<p className="text-sm font-bold text-gray-900">{value}</p>
 						</div>
 					</div>
 				))}

@@ -44,29 +44,25 @@ export default function YouAreOwedCard({ transactions, currentUser, onMarkPaid }
 
 	return (
 		<>
-			<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-amber-500/20 dark:hover:shadow-amber-400/30 transition-all duration-300 flex flex-col">
-			<div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-amber-500/30 to-orange-500/30 dark:from-amber-400/40 dark:to-orange-400/40 rounded-full blur-2xl"></div>
-			
-			<h2 className="relative text-sm font-semibold text-gray-600 dark:text-gray-400">You Are Owed</h2>
+			<div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200 flex flex-col">
+			<p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">You Are Owed</p>
 
-			<p className="relative text-3xl font-bold text-gray-900 dark:text-white">
+			<p className="text-3xl font-bold text-gray-900">
 				${totalOwed.toFixed(2)}
 			</p>
-			<p className="relative text-sm text-gray-600 dark:text-gray-400">
-				{pending.length} pending{' '}
-				{pending.length === 1 ? 'item' : 'items'}
+			<p className="text-sm text-gray-500 mb-2">
+				{pending.length} pending {pending.length === 1 ? 'item' : 'items'}
 			</p>
 
-			{/* progress bar now shows % paid */}
-			<div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+			<div className="w-full bg-gray-100 rounded-full h-1.5 mt-1 mb-4">
 				<div
-					className="h-2 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
+					className="h-1.5 bg-amber-500 rounded-full"
 					style={{ width: `${percentPaid}%` }}
 				/>
 			</div>
 
 			{/* detail list */}
-			<div className="relative mt-4 overflow-y-auto max-h-48 divide-y divide-gray-200 dark:divide-gray-700">
+			<div className="overflow-y-auto max-h-48 divide-y divide-gray-100">
 				{pending.map(r => {
 					const assignees = getAssignees(r.assignees)
 					return (
@@ -75,18 +71,18 @@ export default function YouAreOwedCard({ transactions, currentUser, onMarkPaid }
 							className="py-3 flex justify-between items-center"
 						>
 							<div>
-								<p className="font-medium text-gray-800 dark:text-white">{r.description}</p>
-								<p className="text-xs text-gray-500 dark:text-gray-400">
+								<p className="font-medium text-gray-800">{r.description}</p>
+								<p className="text-xs text-gray-400">
 									Owed by {assignees.join(', ') || '—'}
 								</p>
 							</div>
-							<div className="flex items-center space-x-6">
-								<span className="font-semibold text-gray-800 dark:text-white">
+							<div className="flex items-center space-x-4">
+								<span className="font-semibold text-gray-800">
 									${r.amount.toFixed(2)}
 								</span>
 								<button
 									onClick={() => setMarkPaidModal(r)}
-									className="px-4 py-1.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white text-sm font-medium rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-xl hover:shadow-amber-500/40 transition-all duration-300"
+									className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors duration-150"
 								>
 									Mark Paid
 								</button>
@@ -99,52 +95,39 @@ export default function YouAreOwedCard({ transactions, currentUser, onMarkPaid }
 
 		{/* Mark Paid Confirmation Modal */}
 		{markPaidModal && (
-			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-				<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-emerald-200/60 dark:border-emerald-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
-					{/* Success Gradient Orb */}
-					<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
-					
-					{/* Close Button */}
+			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+				<div className="relative w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
 					<button
 						onClick={() => setMarkPaidModal(null)}
-						className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors z-10"
+						className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
 					>
-						<X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+						<X className="w-5 h-5 text-gray-500" />
 					</button>
 
-					{/* Title */}
-					<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-6">
-						Mark as Paid
-					</h2>
+					<h2 className="text-xl font-bold text-gray-900 mb-6">Mark as Paid</h2>
 
-					{/* Expense Details */}
-					<div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 rounded-2xl p-5 mb-6 border border-emerald-200/50 dark:border-emerald-800/50">
-						<p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-2">
-							{markPaidModal.description}
-						</p>
-						<p className="text-center text-3xl font-bold text-gray-900 dark:text-white mb-2">
-							${markPaidModal.amount.toFixed(2)}
-						</p>
-						<p className="text-center text-xs text-gray-500 dark:text-gray-400">
+					<div className="bg-gray-50 rounded-xl p-5 mb-6">
+						<p className="text-center text-sm text-gray-500 mb-2">{markPaidModal.description}</p>
+						<p className="text-center text-3xl font-bold text-gray-900 mb-2">${markPaidModal.amount.toFixed(2)}</p>
+						<p className="text-center text-xs text-gray-400">
 							Owed by: {getAssignees(markPaidModal.assignees).join(', ')}
 						</p>
 					</div>
 
-					<p className="relative text-center text-sm text-gray-600 dark:text-gray-400 mb-6">
+					<p className="text-center text-sm text-gray-500 mb-6">
 						Confirm that this payment has been received?
 					</p>
 
-					{/* Action Buttons */}
-					<div className="relative flex gap-3">
+					<div className="flex gap-3">
 						<button
 							onClick={() => handleMarkPaid(markPaidModal.id)}
-							className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+							className="flex-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-colors duration-150"
 						>
 							Mark as Paid
 						</button>
 						<button
 							onClick={() => setMarkPaidModal(null)}
-							className="px-6 py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-all duration-300"
+							className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors duration-150"
 						>
 							Cancel
 						</button>

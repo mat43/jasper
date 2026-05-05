@@ -39,36 +39,32 @@ export default function YouOweCard({
 		: 0
 
 	return (
-		<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-emerald-500/20 dark:hover:shadow-emerald-400/30 transition-all duration-300 space-y-4">
-			<div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-br from-emerald-500/30 to-teal-500/30 dark:from-emerald-400/40 dark:to-teal-400/40 rounded-full blur-2xl"></div>
-			
-			<div className="relative flex items-center justify-between">
-				<div className="flex items-center space-x-2">
-					<CurrencyDollarIcon className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
-					<h3 className="text-sm font-semibold text-gray-600 dark:text-gray-400">You Owe</h3>
-				</div>
+		<div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200 space-y-4">
+			<div className="flex items-center space-x-2">
+				<CurrencyDollarIcon className="w-6 h-6 text-emerald-500" />
+				<p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">You Owe</p>
 			</div>
 
-			<p className="relative text-4xl font-bold text-gray-900 dark:text-white">${youOwe.toFixed(2)}</p>
+			<p className="text-4xl font-bold text-gray-900">${youOwe.toFixed(2)}</p>
 
-			<div className="relative flex flex-wrap gap-2">
+			<div className="flex flex-wrap gap-2">
 				{categoriesOwed.map(cat => (
 					<span
 						key={cat}
-						className="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 px-2.5 py-1 rounded-full font-medium"
+						className="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium"
 					>
 						{cat}
 					</span>
 				))}
 			</div>
 
-			<div className="relative text-sm text-gray-600 dark:text-gray-400">
+			<p className="text-sm text-gray-500">
 				{numItems} pending {numItems === 1 ? 'item' : 'items'}, largest ${largestPending}
-			</div>
+			</p>
 
-			<div className="relative w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+			<div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
 				<div
-					className="h-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+					className="h-1.5 bg-emerald-500 rounded-full transition-all duration-500"
 					style={{ width: `${percentPaid}%` }}
 				/>
 			</div>

@@ -57,9 +57,9 @@ export default function WeatherWidget() {
 
 	if (loading || error) {
 		return (
-			<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-xl hover:shadow-yellow-500/10 dark:hover:shadow-yellow-400/20 transition-all duration-300 flex items-center justify-center min-h-[200px]">
+			<div className="bg-white border border-gray-200 rounded-2xl p-6 flex items-center justify-center min-h-[200px]">
 				{loading
-					? <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+					? <p className="text-gray-500">Loading...</p>
 					: <p className="text-red-500 text-sm">Error: {error}</p>
 				}
 			</div>
@@ -82,25 +82,24 @@ export default function WeatherWidget() {
 	]
 
 	return (
-		<div className="group relative overflow-hidden bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-2xl p-6 hover:shadow-2xl hover:shadow-yellow-500/20 dark:hover:shadow-yellow-400/30 transition-all duration-300 flex flex-col">
-				<div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 dark:from-yellow-400/40 dark:to-orange-400/40 rounded-full blur-2xl"></div>
-			<div className="relative flex items-center justify-between mb-4">
+		<div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200 flex flex-col">
+			<div className="flex items-center justify-between mb-4">
 				<div className="space-y-1">
-					<h2 className="text-sm font-semibold text-gray-600 dark:text-gray-400">Weather</h2>
-					<p className="text-4xl font-bold text-gray-900 dark:text-white">{temp}°F</p>
-					<p className="text-sm text-gray-600 dark:text-gray-400 capitalize">{description}</p>
+					<p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Weather</p>
+					<p className="text-4xl font-bold text-gray-900">{temp}°F</p>
+					<p className="text-sm text-gray-500 capitalize">{description}</p>
 				</div>
 				<Icon className={`w-20 h-20 ${color}`} />
 			</div>
 
 			{/* Stats grid */}
-			<div className="relative grid grid-cols-2 gap-3 text-sm">
+			<div className="grid grid-cols-2 gap-2 text-sm">
 				{stats.map(({ label, value, Icon: StatIcon }) => (
-					<div key={label} className="flex items-center space-x-2 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-2.5">
-						<StatIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+					<div key={label} className="flex items-center space-x-2 bg-gray-50 rounded-xl p-2.5">
+						<StatIcon className="w-5 h-5 text-gray-400" />
 						<div>
-							<p className="text-xs text-gray-600 dark:text-gray-400">{label}</p>
-							<p className="font-semibold text-gray-900 dark:text-white">{value}</p>
+							<p className="text-xs text-gray-400">{label}</p>
+							<p className="font-semibold text-gray-700">{value}</p>
 						</div>
 					</div>
 				))}

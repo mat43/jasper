@@ -90,9 +90,8 @@ export default function AccountSettingsModal({ user, onClose }) {
 						onSubmit={handleSubmit}
 					>
 						{/* Gradient Orb */}
-						<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
 						
-						<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">
+						<h2 className="relative text-2xl font-bold text-center bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">
 							Account Settings
 						</h2>
 
@@ -116,7 +115,7 @@ export default function AccountSettingsModal({ user, onClose }) {
 									onChange={handleAvatarChange}
 									className="absolute inset-0 w-full h-full opacity-0 cursor-pointer rounded-full"
 								/>
-									<div className="absolute bottom-1 right-1 bg-gradient-to-br from-indigo-500 to-purple-500 p-2 rounded-full shadow-lg">
+									<div className="absolute bottom-1 right-1 bg-linear-to-br from-indigo-500 to-purple-500 p-2 rounded-full shadow-lg">
 										<CameraIcon className="w-4 h-4 text-white" />
 									</div>
 								</div>
@@ -197,7 +196,7 @@ export default function AccountSettingsModal({ user, onClose }) {
 
 						<button
 							type="submit"
-							className="relative w-full px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-xl transition-all"
+							className="relative w-full px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-xl transition-all"
 						>
 							Save Changes
 						</button>

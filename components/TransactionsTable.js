@@ -182,13 +182,12 @@ export default function TransactionsTable({
 		<>
 			<div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/60 dark:border-gray-800/60 rounded-2xl shadow-lg p-6 overflow-x-auto">
 			{/* Gradient Orb */}
-			<div className="absolute top-4 right-4 w-40 h-40 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-full blur-2xl opacity-20 pointer-events-none" />
 			
 			<div className="flex justify-between items-center mb-4 relative z-10">
 				<h2 className="text-lg font-medium text-gray-900 dark:text-white">All Transactions</h2>
 				<button 
 					onClick={exportCSV} 
-					className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-lg shadow-md hover:shadow-lg transition-all"
+					className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-lg shadow-md hover:shadow-lg transition-all"
 				>
 					Export CSV
 				</button>
@@ -266,7 +265,7 @@ export default function TransactionsTable({
 													{!t.paid ? (
 														<button
 															onClick={() => openSettleModal(t)}
-															className="px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg shadow-md hover:shadow-lg transition-all"
+															className="px-3 py-1.5 text-xs font-medium text-white bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg shadow-md hover:shadow-lg transition-all"
 															title="Settle payment"
 														>
 															Settle
@@ -297,7 +296,7 @@ export default function TransactionsTable({
 													) : (
 														<button
 															onClick={() => setMarkPaidModal(t)}
-															className="px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-lg shadow-md hover:shadow-lg transition-all"
+															className="px-3 py-1.5 text-xs font-medium text-white bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-lg shadow-md hover:shadow-lg transition-all"
 															title="Mark as paid"
 														>
 															Mark Paid
@@ -317,7 +316,7 @@ export default function TransactionsTable({
 											{currentUser && isMathew && !isCreator && (
 												<button
 													onClick={() => setForceDeleteModal(t)}
-													className="px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded-lg shadow-md hover:shadow-lg transition-all"
+													className="px-3 py-1.5 text-xs font-medium text-white bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded-lg shadow-md hover:shadow-lg transition-all"
 													title="Force delete (organizer only)"
 												>
 													Force Delete
@@ -356,7 +355,7 @@ export default function TransactionsTable({
 									onClick={() => setCurrentPage(page)}
 									className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
 										page === currentPage
-											? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-md'
+											? 'bg-linear-to-r from-violet-600 to-fuchsia-600 text-white shadow-md'
 											: 'bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
 									}`}
 								>
@@ -384,7 +383,6 @@ export default function TransactionsTable({
 			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
 				<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-red-200/60 dark:border-red-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
 					{/* Warning Gradient Orb */}
-					<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500 to-orange-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
 					
 					{/* Close Button */}
 					<button
@@ -396,13 +394,13 @@ export default function TransactionsTable({
 
 					{/* Warning Icon */}
 					<div className="relative flex justify-center mb-6">
-						<div className="p-4 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl">
+						<div className="p-4 bg-linear-to-br from-red-500/20 to-orange-500/20 rounded-2xl">
 							<AlertTriangle className="w-12 h-12 text-red-600 dark:text-red-400" />
 						</div>
 					</div>
 
 					{/* Title */}
-					<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-2">
+					<h2 className="relative text-2xl font-bold text-center bg-linear-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-2">
 						Delete Transaction?
 					</h2>
 					
@@ -411,7 +409,7 @@ export default function TransactionsTable({
 					</p>
 
 					{/* Transaction Details */}
-					<div className="relative bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-red-200/50 dark:border-red-800/50">
+					<div className="relative bg-linear-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-red-200/50 dark:border-red-800/50">
 						<p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-2">
 							{deleteModal.description}
 						</p>
@@ -433,7 +431,7 @@ export default function TransactionsTable({
 						</button>
 						<button
 							onClick={handleDelete}
-							className="flex-1 px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded-xl shadow-lg hover:shadow-xl transition-all"
+							className="flex-1 px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded-xl shadow-lg hover:shadow-xl transition-all"
 						>
 							Delete
 						</button>
@@ -447,7 +445,6 @@ export default function TransactionsTable({
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
 					<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-emerald-200/60 dark:border-emerald-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
 						{/* Success Gradient Orb */}
-						<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
 						
 						{/* Close Button */}
 						<button
@@ -458,12 +455,12 @@ export default function TransactionsTable({
 						</button>
 
 						{/* Title */}
-						<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-6">
+						<h2 className="relative text-2xl font-bold text-center bg-linear-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-6">
 							Mark as Paid
 						</h2>
 
 						{/* Expense Details */}
-						<div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 rounded-2xl p-5 mb-6 border border-emerald-200/50 dark:border-emerald-800/50">
+						<div className="relative bg-linear-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/50 dark:to-teal-950/50 rounded-2xl p-5 mb-6 border border-emerald-200/50 dark:border-emerald-800/50">
 							<p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-2">
 								{markPaidModal.description}
 							</p>
@@ -483,7 +480,7 @@ export default function TransactionsTable({
 						<div className="relative flex gap-3">
 							<button
 								onClick={() => togglePaidStatus(markPaidModal.id, markPaidModal.paid)}
-								className="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
+								className="flex-1 px-6 py-3 bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300"
 							>
 								Mark as Paid
 							</button>
@@ -503,7 +500,6 @@ export default function TransactionsTable({
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
 					<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-amber-200/60 dark:border-amber-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
 						{/* Warning Gradient Orb */}
-						<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
 						
 						{/* Close Button */}
 						<button
@@ -514,12 +510,12 @@ export default function TransactionsTable({
 						</button>
 
 						{/* Title */}
-						<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-6">
+						<h2 className="relative text-2xl font-bold text-center bg-linear-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-6">
 							Mark as Unpaid
 						</h2>
 
 						{/* Expense Details */}
-						<div className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-amber-200/50 dark:border-amber-800/50">
+						<div className="relative bg-linear-to-br from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-amber-200/50 dark:border-amber-800/50">
 							<p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-2">
 								{markUnpaidModal.description}
 							</p>
@@ -539,7 +535,7 @@ export default function TransactionsTable({
 						<div className="relative flex gap-3">
 							<button
 								onClick={() => togglePaidStatus(markUnpaidModal.id, markUnpaidModal.paid)}
-								className="flex-1 px-6 py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-semibold shadow-lg shadow-amber-500/30 hover:shadow-xl hover:shadow-amber-500/40 transition-all duration-300"
+								className="flex-1 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-semibold shadow-lg shadow-amber-500/30 hover:shadow-xl hover:shadow-amber-500/40 transition-all duration-300"
 							>
 								Mark as Unpaid
 							</button>
@@ -559,7 +555,6 @@ export default function TransactionsTable({
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
 					<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-red-200/60 dark:border-red-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
 						{/* Warning Gradient Orb */}
-						<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500 to-orange-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
 						
 						{/* Close Button */}
 						<button
@@ -577,12 +572,12 @@ export default function TransactionsTable({
 						</div>
 
 						{/* Title */}
-						<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-4">
+						<h2 className="relative text-2xl font-bold text-center bg-linear-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-4">
 							Force Delete Warning
 						</h2>
 
 						{/* Warning Message */}
-						<div className="relative bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-red-200/50 dark:border-red-800/50">
+						<div className="relative bg-linear-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-red-200/50 dark:border-red-800/50">
 							<p className="text-center text-gray-800 dark:text-gray-200 mb-3">
 								This expense was created by <span className="font-bold text-red-600 dark:text-red-400">{forceDeleteModal.createdBy}</span>.
 							</p>
@@ -602,7 +597,7 @@ export default function TransactionsTable({
 						<div className="relative flex gap-3">
 							<button
 								onClick={handleForceDelete}
-								className="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-xl font-semibold shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 transition-all duration-300"
+								className="flex-1 px-6 py-3 bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white rounded-xl font-semibold shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 transition-all duration-300"
 							>
 								Force Delete
 							</button>
@@ -622,7 +617,6 @@ export default function TransactionsTable({
 				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
 					<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-gray-200/60 dark:border-gray-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
 						{/* Gradient Orb */}
-						<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
 						
 						{/* Close Button */}
 						<button
@@ -633,12 +627,12 @@ export default function TransactionsTable({
 						</button>
 
 						{/* Title */}
-						<h2 className="relative text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">
+						<h2 className="relative text-2xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6">
 							Settle Payment
 						</h2>
 
 						{/* Settlement Details */}
-						<div className="relative bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-2xl p-5 mb-6 border border-indigo-200/50 dark:border-indigo-800/50">
+						<div className="relative bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-2xl p-5 mb-6 border border-indigo-200/50 dark:border-indigo-800/50">
 							<div className="flex justify-between items-center mb-2">
 								<span className="text-sm font-medium text-gray-600 dark:text-gray-400">Amount Due</span>
 								<span className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -724,7 +718,7 @@ export default function TransactionsTable({
 						<div className="relative flex gap-3">
 							<button
 								onClick={handleSettleProceed}
-								className="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-300"
+								className="flex-1 px-6 py-3 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-300"
 							>
 								Proceed
 							</button>

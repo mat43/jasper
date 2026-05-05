@@ -36,7 +36,7 @@ export default function ChatWidget() {
 				onClick={toggleOpen}
 				whileHover={{ scale: 1.1 }}
 				whileTap={{ scale: 0.95 }}
-				className="fixed bottom-6 right-6 bg-gradient-to-br from-blue-500 to-indigo-500 text-white p-4 rounded-2xl shadow-2xl z-50 backdrop-blur-sm"
+				className="fixed bottom-6 right-6 bg-linear-to-br from-blue-500 to-indigo-500 text-white p-4 rounded-2xl shadow-2xl z-50 backdrop-blur-sm"
 				aria-label="Chat with Jasper"
 			>
 				<svg
@@ -61,7 +61,7 @@ export default function ChatWidget() {
 						className="fixed bottom-24 right-6 w-88 h-96 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden"
 					>
 						{/* Header */}
-						<div className="px-4 py-3 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-t-2xl">
+						<div className="px-4 py-3 bg-linear-to-br from-blue-500 to-indigo-500 rounded-t-2xl">
 							<h3 className="text-white font-semibold">Chat with Jasper</h3>
 						</div>
 
@@ -93,7 +93,7 @@ export default function ChatWidget() {
 								/>
 								<button
 									onClick={sendMessage}
-									className="flex-none bg-gradient-to-br from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white border border-transparent rounded-r-lg px-4 py-2 whitespace-nowrap transition"
+									className="flex-none bg-linear-to-br from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white border border-transparent rounded-r-lg px-4 py-2 whitespace-nowrap transition"
 								>
 									Send
 								</button>

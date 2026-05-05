@@ -17,6 +17,8 @@ model User {
   avatarUrl     String?
   email         String?   @unique
   venmoUsername String?
+  isAdmin       Boolean   @default(false)
+  isActive      Boolean   @default(true)
 }
 
 model List {

@@ -1,72 +1,86 @@
-// Imports
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../auth/[...nextauth]/route';
-import prisma from '@/lib/prisma';
+import { NextResponse } from 'next/server'
+import { requireAuth, parseBody, logError } from '@/lib/auth'
+import { patchProfileSchema } from '@/lib/schemas'
+import prisma from '@/lib/prisma'
 
 export async function PATCH(req) {
-	// Authentication
-	const session = await getServerSession(authOptions);
-	if (!session) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
+  const { session, unauth } = await requireAuth()
+  if (unauth) return unauth
 
-	// Parse JSON body
-	const { firstName, lastName, email, venmo, avatar, password, confirm } = await req.json();
+  const { data, bodyError } = await parseBody(req, patchProfileSchema)
+  if (bodyError) return bodyError
 
-	// Upload avatar externally if provided in base64
-	let avatarUrl = avatar;
-	if (avatar && avatar.startsWith('data:')) {
-		try {
-			const [, base64] = avatar.split(',');
-			const mimeMatch = avatar.match(/data:(image\/\w+);/);
-			const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
-			const ext = mimeType.split('/')[1] || 'png';
-			const filename = `${session.user.username}-${Date.now()}.${ext}`;
-			const buffer = Buffer.from(base64, 'base64');
+  const { firstName, lastName, email, venmo, avatar, password } = data
 
-			// Prepare form data
-			const formData = new FormData();
-			formData.append('file', new Blob([buffer], { type: mimeType }), filename);
+  // ── Avatar upload ─────────────────────────────────────────────────────────
+  let avatarUrl = avatar
+  if (avatar && avatar.startsWith('data:')) {
+    try {
+      const [, base64]  = avatar.split(',')
+      const mimeMatch   = avatar.match(/data:(image\/\w+);/)
+      const mimeType    = mimeMatch ? mimeMatch[1] : 'image/png'
+      const ext         = mimeType.split('/')[1] || 'png'
+      const filename    = `${session.user.username}-${Date.now()}.${ext}`
+      const buffer      = Buffer.from(base64, 'base64')
 
-			// Upload to external service
-			const uploadRes = await fetch('https://img.mathew.ws/upload', {
-				method: 'POST',
-				body: formData,
-			});
+      const formData = new FormData()
+      formData.append('file', new Blob([buffer], { type: mimeType }), filename)
 
-			if (!uploadRes.ok) {
-				throw new Error('Avatar upload failed');
-			}
+      const uploadRes = await fetch('https://img.mathew.ws/upload', {
+        method: 'POST',
+        body:   formData,
+      })
 
-			const uploadData = await uploadRes.json();
-			avatarUrl = uploadData.url + "/inline";
-		} catch (err) {
-			console.error('Upload error:', err);
-			return NextResponse.json({ error: 'Avatar upload failed' }, { status: 500 });
-		}
-	}
+      if (!uploadRes.ok) throw new Error('Upload service returned non-2xx')
 
-	// Build update data
-	const updateData = {
-		avatarUrl,
-		name: `${firstName || ''} ${lastName || ''}`.trim(),
-		email,
-		venmoUsername: venmo,
-	};
+      const uploadData = await uploadRes.json()
 
-	// Conditionally include password
-	if (password && password === confirm) {
-		const bcrypt = await import('bcryptjs');
-		updateData.password = await bcrypt.hash(password, 10);
-	}
+      // Validate the returned URL before storing it
+      if (!uploadData.url || typeof uploadData.url !== 'string') {
+        throw new Error('Upload service returned invalid URL')
+      }
+      new URL(uploadData.url) // throws if not a valid absolute URL
 
-	// Update user in DB using username
-	const updatedUser = await prisma.user.update({
-		where: { username: session.user.username },
-		data: updateData,
-	});
+      avatarUrl = uploadData.url + '/inline'
+    } catch (err) {
+      logError('profile avatar upload', err)
+      return NextResponse.json({ error: 'Avatar upload failed' }, { status: 500 })
+    }
+  }
 
-	// Return 200 and updated user
-	return NextResponse.json({ ok: true, user: updatedUser });
+  // ── Build update payload ──────────────────────────────────────────────────
+  const updateData = {
+    avatarUrl,
+    name:          `${firstName ?? ''} ${lastName ?? ''}`.trim() || undefined,
+    email:         email  || undefined,
+    venmoUsername: venmo  || undefined,
+  }
+
+  // Only hash & store password when it was explicitly supplied (Zod already
+  // verified that password === confirm before we get here)
+  if (password) {
+    const bcrypt = await import('bcryptjs')
+    updateData.password = await bcrypt.hash(password, 12)
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where:  { username: session.user.username },
+      data:   updateData,
+      // ⚠️ Explicitly exclude the password hash from the response
+      select: {
+        id:           true,
+        username:     true,
+        name:         true,
+        email:        true,
+        avatarUrl:    true,
+        venmoUsername: true,
+      },
+    })
+    return NextResponse.json({ ok: true, user: updatedUser })
+  } catch (err) {
+    logError('PATCH /api/user/profile', err)
+    return NextResponse.json({ error: 'Profile update failed' }, { status: 500 })
+  }
 }
+

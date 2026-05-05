@@ -35,7 +35,6 @@ export default function RecurringRulesTable({
 		<>
 		<div className="relative bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-gray-200/60 dark:border-gray-800/60 rounded-2xl shadow-lg p-6 overflow-x-auto">
 			{/* Gradient Orb */}
-			<div className="absolute top-4 right-4 w-40 h-40 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full blur-2xl opacity-20 pointer-events-none" />
 			<h2 className="relative z-10 text-lg font-medium text-gray-900 dark:text-white mb-4">Recurring Rules</h2>
 			<table className="w-full text-left table-auto relative z-10">
 				<thead>
@@ -117,7 +116,6 @@ export default function RecurringRulesTable({
 			<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
 				<div className="relative w-full max-w-md bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border border-red-200/60 dark:border-red-800/60 rounded-3xl shadow-2xl p-8 animate-slideUp">
 					{/* Warning Gradient Orb */}
-					<div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-red-500 to-orange-500 rounded-full blur-3xl opacity-30 pointer-events-none" />
 					
 					{/* Close Button */}
 					<button
@@ -129,13 +127,13 @@ export default function RecurringRulesTable({
 
 					{/* Warning Icon */}
 					<div className="relative flex justify-center mb-6">
-						<div className="p-4 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl">
+						<div className="p-4 bg-linear-to-br from-red-500/20 to-orange-500/20 rounded-2xl">
 							<AlertTriangle className="w-12 h-12 text-red-600 dark:text-red-400" />
 						</div>
 					</div>
 
 					{/* Title */}
-					<h2 className="relative text-2xl font-bold text-center bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-2">
+					<h2 className="relative text-2xl font-bold text-center bg-linear-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-2">
 						Remove Recurring Rule?
 					</h2>
 					
@@ -144,7 +142,7 @@ export default function RecurringRulesTable({
 					</p>
 
 					{/* Rule Details */}
-					<div className="relative bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-red-200/50 dark:border-red-800/50">
+					<div className="relative bg-linear-to-br from-red-50 to-orange-50 dark:from-red-950/50 dark:to-orange-950/50 rounded-2xl p-5 mb-6 border border-red-200/50 dark:border-red-800/50">
 						<p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-2">
 							{deleteModal.description}
 						</p>
@@ -166,7 +164,7 @@ export default function RecurringRulesTable({
 						</button>
 						<button
 							onClick={handleDelete}
-							className="flex-1 px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded-xl shadow-lg hover:shadow-xl transition-all"
+							className="flex-1 px-6 py-3 text-sm font-medium text-white bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded-xl shadow-lg hover:shadow-xl transition-all"
 						>
 							Remove Rule
 						</button>
