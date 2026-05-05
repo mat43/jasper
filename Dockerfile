@@ -35,11 +35,15 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/standalone ./
 
-# Copy Prisma files if your app needs migrations/schema at runtime
+# Copy Prisma files needed for migrations at runtime
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+# Run migrations then start the app
+CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
