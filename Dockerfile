@@ -37,7 +37,6 @@ COPY --from=builder /app/.next/standalone ./
 
 # Copy Prisma files needed for migrations at runtime
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
@@ -46,4 +45,5 @@ USER nextjs
 EXPOSE 3000
 
 # Run migrations then start the app
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+# Use node directly to avoid .bin wrapper WASM path issues
+CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node server.js"]
