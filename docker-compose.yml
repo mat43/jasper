@@ -3,7 +3,7 @@ services:
     build: .
     container_name: jasper
     ports:
-      - "3000:3000"
+      - "4278:3000"
     env_file:
       - .env
     restart: unless-stopped
