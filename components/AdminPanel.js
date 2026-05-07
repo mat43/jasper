@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import { X, ShieldCheck, ShieldOff, KeyRound, Trash2, UserPlus, Check, AlertTriangle } from 'lucide-react'
 
 export default function AdminPanel({ onClose }) {
+  const { data: session } = useSession()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -163,7 +165,8 @@ export default function AdminPanel({ onClose }) {
                 <button
                   onClick={() => toggleActive(user.username, user.isActive)}
                   title={user.isActive ? 'Deactivate' : 'Activate'}
-                  className={`p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 ${
+                  disabled={user.username === session?.user?.username}
+                  className={`p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 disabled:opacity-30 disabled:cursor-not-allowed ${
                     user.isActive ? 'hover:text-orange-500' : 'hover:text-emerald-600'
                   }`}
                 >
@@ -180,7 +183,8 @@ export default function AdminPanel({ onClose }) {
                 <button
                   onClick={() => setDeleteModal({ username: user.username, name: user.name || user.username })}
                   title="Delete user"
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-red-600"
+                  disabled={user.username === session?.user?.username}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-500 hover:text-red-600 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-500"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
