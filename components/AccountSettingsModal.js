@@ -55,8 +55,7 @@ export default function AccountSettingsModal({ user, onClose }) {
 			email,
 			venmo,
 			avatar: avatarPreview, // this is a data URL string
-			password,
-			confirm,
+			...(password ? { password, confirm } : {}),
 		};
 		const res = await fetch('/api/user/profile', {
 			method: 'PATCH',
