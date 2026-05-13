@@ -26,9 +26,10 @@ export async function PATCH(req) {
       const formData = new FormData()
       formData.append('file', new Blob([buffer], { type: mimeType }), filename)
 
-      const uploadRes = await fetch('https://img.mathew.ws/upload', {
-        method: 'POST',
-        body:   formData,
+      const uploadRes = await fetch('https://img.mathew.ws/api/upload', {
+        method:  'POST',
+        headers: { 'x-api-key': process.env.IMG_API_KEY },
+        body:    formData,
       })
 
       if (!uploadRes.ok) throw new Error('Upload service returned non-2xx')
@@ -36,12 +37,12 @@ export async function PATCH(req) {
       const uploadData = await uploadRes.json()
 
       // Validate the returned URL before storing it
-      if (!uploadData.url || typeof uploadData.url !== 'string') {
+      if (!uploadData.publicUrl || typeof uploadData.publicUrl !== 'string') {
         throw new Error('Upload service returned invalid URL')
       }
-      new URL(uploadData.url) // throws if not a valid absolute URL
+      new URL(uploadData.publicUrl) // throws if not a valid absolute URL
 
-      avatarUrl = uploadData.url + '/inline'
+      avatarUrl = uploadData.publicUrl
     } catch (err) {
       logError('profile avatar upload', err)
       return NextResponse.json({ error: 'Avatar upload failed' }, { status: 500 })
