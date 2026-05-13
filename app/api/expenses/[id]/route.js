@@ -18,7 +18,7 @@ export async function DELETE(request, context) {
       select: { createdBy: true },
     })
     if (!expense) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-    if (expense.createdBy !== session.user.username) {
+    if (expense.createdBy !== session.user.username && !session.user.isAdmin) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
