@@ -37,12 +37,12 @@ export async function PATCH(req) {
       const uploadData = await uploadRes.json()
 
       // Validate the returned URL before storing it
-      if (!uploadData.publicUrl || typeof uploadData.publicUrl !== 'string') {
+      if (!uploadData.url || typeof uploadData.url !== 'string') {
         throw new Error('Upload service returned invalid URL')
       }
-      new URL(uploadData.publicUrl) // throws if not a valid absolute URL
+      new URL(uploadData.url) // throws if not a valid absolute URL
 
-      avatarUrl = uploadData.publicUrl
+      avatarUrl = uploadData.url
     } catch (err) {
       logError('profile avatar upload', err)
       return NextResponse.json({ error: 'Avatar upload failed' }, { status: 500 })
