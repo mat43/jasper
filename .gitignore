@@ -51,5 +51,4 @@ public/uploads
 
 #prisma
 prisma/prod.db
-prisma/migrations
 prisma/seed.js
