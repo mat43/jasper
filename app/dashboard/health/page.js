@@ -352,8 +352,10 @@ function AddFoodModal({ date, defaultMeal, onAdded, onClose }) {
 }
 
 function PhotoAnalyzeModal({ date, onAdded, onClose }) {
+  const [mode, setMode]             = useState('photo') // 'photo' | 'text'
   const [preview, setPreview]       = useState(null)
   const [imageData, setImageData]   = useState(null)
+  const [description, setDescription] = useState('')
   const [context, setContext]       = useState('')
   const [analyzing, setAnalyzing]   = useState(false)
   const [result, setResult]         = useState(null)
@@ -363,6 +365,12 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
   const [saving, setSaving]         = useState(false) // false | 'log' | 'library'
   const [error, setError]           = useState('')
   const inputRef = useRef(null)
+
+  function switchMode(m) {
+    setMode(m)
+    setResult(null); setEditResult(null); setError('')
+    setPreview(null); setImageData(null); setDescription(''); setContext('')
+  }
 
   function handleFile(e) {
     const file = e.target.files[0]
@@ -379,13 +387,17 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
   }
 
   async function handleAnalyze() {
-    if (!imageData) return
+    if (mode === 'photo' && !imageData) return
+    if (mode === 'text' && !description.trim()) return
     setAnalyzing(true)
     setError('')
+    const body = mode === 'photo'
+      ? { imageData, context: context.trim() || undefined }
+      : { description: description.trim(), context: context.trim() || undefined }
     const res = await fetch('/api/health/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageData, context: context.trim() || undefined }),
+      body: JSON.stringify(body),
     })
     const data = await res.json()
     if (!res.ok) { setError(data.error || 'Analysis failed'); setAnalyzing(false); return }
@@ -454,31 +466,55 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
   return (
     <Modal onClose={onClose} maxW="max-w-sm">
       <div className="p-6 space-y-4">
-        <h2 className="text-lg font-bold text-gray-900">Analyze Food Photo</h2>
+        <h2 className="text-lg font-bold text-gray-900">Analyze Food</h2>
+
+        {/* Mode toggle */}
+        {!result && (
+          <div className="flex rounded-xl border border-gray-200 p-0.5 gap-0.5">
+            {[['photo', '📷 Photo'], ['text', '✏️ Describe']].map(([m, label]) => (
+              <button key={m} type="button" onClick={() => switchMode(m)}
+                className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition ${
+                  mode === m ? 'bg-emerald-500 text-white' : 'text-gray-500 hover:text-gray-700'
+                }`}>{label}</button>
+            ))}
+          </div>
+        )}
 
         {error && <p className="text-sm text-red-500 bg-red-50 rounded-xl px-3 py-2">{error}</p>}
 
-        <div onClick={() => !result && inputRef.current?.click()}
-          className={`relative border-2 border-dashed rounded-xl overflow-hidden ${!result ? 'cursor-pointer hover:border-emerald-400' : ''} border-gray-200 transition`}
-          style={{ minHeight: preview ? undefined : '110px' }}>
-          {preview
-            ? <img src={preview} alt="food" className="w-full object-cover max-h-44" />
-            : <div className="flex flex-col items-center justify-center h-28 text-gray-400 gap-2">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <p className="text-sm">Tap to upload or take photo</p>
-              </div>
-          }
-          <input ref={inputRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
-        </div>
+        {mode === 'photo' && (
+          <div onClick={() => !result && inputRef.current?.click()}
+            className={`relative border-2 border-dashed rounded-xl overflow-hidden ${!result ? 'cursor-pointer hover:border-emerald-400' : ''} border-gray-200 transition`}
+            style={{ minHeight: preview ? undefined : '110px' }}>
+            {preview
+              ? <img src={preview} alt="food" className="w-full object-cover max-h-44" />
+              : <div className="flex flex-col items-center justify-center h-28 text-gray-400 gap-2">
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <p className="text-sm">Tap to upload or take photo</p>
+                </div>
+            }
+            <input ref={inputRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+          </div>
+        )}
 
-        {preview && !result && (
+        {mode === 'text' && !result && (
+          <div>
+            <label className="text-xs font-medium text-gray-500 block mb-1">Food description</label>
+            <textarea value={description} onChange={e => setDescription(e.target.value)}
+              placeholder="e.g. pb&j sandwich 200g, large bowl of oatmeal with banana, chicken breast 150g with rice…"
+              rows={3}
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none" />
+          </div>
+        )}
+
+        {!result && (mode === 'photo' ? preview : description.trim()) && (
           <div>
             <label className="text-xs font-medium text-gray-500 block mb-1">
-              Context <span className="font-normal text-gray-400">(optional — helps AI accuracy)</span>
+              Extra context <span className="font-normal text-gray-400">(optional)</span>
             </label>
             <input type="text" value={context}
               onChange={e => setContext(e.target.value)}
@@ -487,7 +523,7 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
           </div>
         )}
 
-        {preview && !result && (
+        {!result && (mode === 'photo' ? preview : description.trim()) && (
           <button onClick={handleAnalyze} disabled={analyzing}
             className="w-full py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 disabled:opacity-50 transition flex items-center justify-center gap-2">
             {analyzing
@@ -548,7 +584,7 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
           </div>
         )}
 
-        {!preview && (
+        {!result && !(mode === 'photo' ? preview : description.trim()) && (
           <button type="button" onClick={onClose}
             className="w-full py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition">
             Cancel

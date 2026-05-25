@@ -18,21 +18,22 @@ export async function POST(req) {
   }
 
   try {
-    let { imageData, mimeType, context } = data
+    let { imageData, mimeType, context, description } = data
 
     // Validate image type from data URL
-    if (imageData.startsWith('data:')) {
-      const match = imageData.match(/^data:(image\/[\w+]+);base64,/)
-      if (!match) return NextResponse.json({ error: 'Invalid image data URL' }, { status: 400 })
-      const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-      if (!allowed.includes(match[1])) {
-        return NextResponse.json({ error: 'Unsupported image type' }, { status: 400 })
+    if (imageData) {
+      if (imageData.startsWith('data:')) {
+        const match = imageData.match(/^data:(image\/[\w+]+);base64,/)
+        if (!match) return NextResponse.json({ error: 'Invalid image data URL' }, { status: 400 })
+        const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        if (!allowed.includes(match[1])) {
+          return NextResponse.json({ error: 'Unsupported image type' }, { status: 400 })
+        }
       }
     }
 
-    const contextNote = context ? `\nAdditional context from the user: "${context}"` : ''
-    const prompt =
-      'Analyze this food image and estimate its nutritional content.' + contextNote + '\n' +
+    const contextNote = context ? `\nAdditional context: "${context}"` : ''
+    const jsonSpec =
       'Return ONLY a valid JSON object — no markdown, no explanation — with exactly these fields:\n' +
       '{\n' +
       '  "foodName": "descriptive name",\n' +
@@ -43,20 +44,23 @@ export async function POST(req) {
       '  "fat": <grams as number>,\n' +
       '  "fiber": <grams as number>,\n' +
       '  "confidence": "low" | "medium" | "high"\n' +
-      '}\n' +
-      'Be conservative. If multiple items are visible, estimate the total. Use the user context to improve accuracy.'
+      '}'
+
+    const prompt = imageData
+      ? 'Analyze this food image and estimate its nutritional content.' + contextNote + '\n' + jsonSpec + '\nBe conservative. If multiple items are visible, estimate the total.'
+      : `Estimate the nutritional content for: "${description}".` + contextNote + '\n' + jsonSpec + '\nBe as accurate as possible given the description.'
 
     const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const messageContent = imageData
+      ? [
+          { type: 'image_url', image_url: { url: imageData, detail: 'original' } },
+          { type: 'text', text: prompt },
+        ]
+      : prompt
     const response = await client.chat.completions.create({
       model: 'gpt-5.5',
       max_completion_tokens: 512,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image_url', image_url: { url: imageData, detail: 'original' } },
-          { type: 'text', text: prompt },
-        ],
-      }],
+      messages: [{ role: 'user', content: messageContent }],
     })
 
     const text = response.choices[0].message.content.trim()
