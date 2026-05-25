@@ -54,7 +54,7 @@ export default function GroceryList() {
 	};
 
 	return (
-		<div className="lg:row-span-2 flex flex-col bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200">
+		<div className="flex flex-col bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow duration-200">
 			<div className="flex justify-between items-center mb-4">
 				<p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Grocery List</p>
 			</div>
@@ -80,7 +80,7 @@ export default function GroceryList() {
 			</div>
 
 			{/* Scrollable list */}
-			<div className="flex-1 overflow-y-auto">
+			<div className="flex-1 overflow-y-auto max-h-36">
 				{loading ? (
 					<p className="text-center text-gray-400 py-4">Loading...</p>
 				) : error ? (

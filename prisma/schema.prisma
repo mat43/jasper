@@ -57,3 +57,60 @@ model Expense {
   template       ExpenseTemplate? @relation(fields: [templateId], references: [id])
 }
 
+// ── Health & Nutrition ────────────────────────────────────────────────────────
+
+model UserHealthProfile {
+  id               String  @id @default(cuid())
+  userId           String  @unique
+  dailyCalorieGoal Int     @default(2000)
+  proteinGoal      Int     @default(150)
+  carbGoal         Int     @default(200)
+  fatGoal          Int     @default(65)
+  waterGoal        Int     @default(64)   // oz
+}
+
+model FoodItem {
+  id          Int       @id @default(autoincrement())
+  name        String
+  brand       String?
+  calories    Int
+  protein     Float
+  carbs       Float
+  fat         Float
+  fiber       Float     @default(0)
+  sugar       Float     @default(0)
+  servingSize Float     @default(1)
+  servingUnit String    @default("serving")
+  createdBy   String
+  logs        FoodLog[]
+}
+
+model PresetMeal {
+  id        Int      @id @default(autoincrement())
+  name      String
+  items     String   // JSON: [{ foodItemId, servings }]
+  createdBy String
+  createdAt DateTime @default(now())
+}
+
+model FoodLog {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  foodItemId  Int
+  foodItem    FoodItem @relation(fields: [foodItemId], references: [id])
+  mealType    String   // breakfast | lunch | dinner | snack
+  servings    Float    @default(1)
+  logDate     String   // YYYY-MM-DD  (local date, for easy day queries)
+  loggedAt    DateTime @default(now())
+  aiGenerated Boolean  @default(false)
+  photoUrl    String?
+  note        String?
+}
+
+model WeightLog {
+  id       Int      @id @default(autoincrement())
+  userId   String
+  weight   Float
+  loggedAt DateTime @default(now())
+}
+

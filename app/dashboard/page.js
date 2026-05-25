@@ -11,6 +11,7 @@ import WeatherWidget from '@/components/WeatherWidget';
 import UpcomingEvents from '@/components/UpcomingEvents';
 import GroceryList from '@/components/GroceryList';
 import SpendingCard from '@/components/SpendingCard'
+import HealthWidget from '@/components/HealthWidget'
 
 // We just store name in database, so split it up
 function splitName(fullName) {
@@ -179,6 +180,9 @@ export default function HomePage() {
 					<p className="font-semibold text-gray-900">Expenses</p>
 					<p className="text-xs text-amber-500 font-medium mt-auto pt-3">View →</p>
 				</button>
+
+				{/* Health & Metrics */}
+				<HealthWidget />
 
 			</div>
 		</div>
