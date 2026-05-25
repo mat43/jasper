@@ -62,10 +62,10 @@ export default function HomePage() {
 	return (
 		<div className="min-h-full py-8">
 			{/* Header */}
-			<div className="max-w-7xl mx-auto px-6 mb-8">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6 mb-8">
 				<div className="flex items-center justify-between">
 					<div>
-						<h1 className="text-3xl font-bold text-gray-900">
+						<h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
 							Welcome back, {firstName}
 						</h1>
 						<p className="text-gray-500 mt-1">Here's your overview for today</p>
@@ -74,7 +74,7 @@ export default function HomePage() {
 			</div>
 
 			{/* Grid */}
-			<div className="max-w-7xl mx-auto px-6">
+			<div className="max-w-7xl mx-auto px-4 sm:px-6">
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
 				{/* Profile (1x1) */}

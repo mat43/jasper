@@ -14,6 +14,7 @@ export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
 			<head>
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<meta name="color-scheme" content="light" />
 			</head>
 			<body className="min-h-screen" style={{colorScheme: 'light'}}>
@@ -21,7 +22,7 @@ export default function RootLayout({ children }) {
 					{/* HEADER (hidden on /login) */}
 					{!isLogin && (
 						<header className="sticky top-0 z-50 border-b border-blue-100 bg-white shadow-sm">
-						<div className="max-w-7xl mx-auto flex h-14 items-center justify-between px-6">
+				<div className="max-w-7xl mx-auto flex h-14 items-center justify-between px-4 sm:px-6">
 							<button
 								onClick={() => router.push('/dashboard')}
 								className="flex items-center gap-3 hover:opacity-80 transition-opacity"

@@ -9,7 +9,9 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
+  BarController,
   LineElement,
+  LineController,
   PointElement,
   Tooltip,
   Legend,
@@ -17,7 +19,7 @@ import {
 import { Doughnut, Bar } from 'react-chartjs-2'
 import { format, addDays, subDays, startOfWeek, eachDayOfInterval, endOfWeek } from 'date-fns'
 
-ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend)
+ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, BarController, LineElement, LineController, PointElement, Tooltip, Legend)
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -817,6 +819,15 @@ export default function HealthPage() {
     fat:      allDayTotals.reduce((s,d)=>s+d.fat,0)      / allDayTotals.length,
   } : null
 
+  const weekDateSet     = new Set(weekDays.map(d => format(d, 'yyyy-MM-dd')))
+  const weekWeightLogs  = weights.filter(w => weekDateSet.has(w.loggedAt.slice(0, 10)))
+  const weekWeightAvg   = weekWeightLogs.length > 0
+    ? r1(weekWeightLogs.reduce((s,w) => s + w.weight, 0) / weekWeightLogs.length)
+    : null
+  const allTimeWeightAvg = weights.length > 0
+    ? r1(weights.reduce((s,w) => s + w.weight, 0) / weights.length)
+    : null
+
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -896,10 +907,10 @@ export default function HealthPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-gray-200/70 rounded-xl p-1 mb-5 w-fit">
+        <div className="flex gap-1 bg-gray-200/70 rounded-xl p-1 mb-5">
           {[['daily','Daily'],['weekly','Weekly'],['alltime','All Time']].map(([key,label]) => (
             <button key={key} onClick={() => setTab(key)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+              className={`flex-1 px-2 sm:px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 tab === key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
               }`}>
               {label}
@@ -967,7 +978,7 @@ export default function HealthPage() {
               return (
                 <div key={meal} className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                   <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0">
                       <span className="text-base">{MEAL_ICONS[meal]}</span>
                       <p className="font-semibold text-gray-800 text-sm">{MEAL_LABELS[meal]}</p>
                       {mealLogs.length > 0 && (
@@ -1132,6 +1143,28 @@ export default function HealthPage() {
                   })}
                 </div>
 
+                {weekWeightAvg !== null && (
+                  <div className="bg-white rounded-2xl border border-gray-200 p-4 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1">Weight this week</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {weekWeightAvg} <span className="text-sm font-normal text-gray-400">lbs avg</span>
+                      </p>
+                      {weekWeightLogs.length > 1 && (
+                        <p className="text-xs text-gray-400 mt-0.5">{weekWeightLogs.length} measurements</p>
+                      )}
+                    </div>
+                    {weekWeightLogs.length > 1 && (
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400">Range</p>
+                        <p className="text-sm font-medium text-gray-700">
+                          {r1(Math.min(...weekWeightLogs.map(w => w.weight)))} – {r1(Math.max(...weekWeightLogs.map(w => w.weight)))} lbs
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Calorie bar chart */}
                 <div className="bg-white rounded-2xl border border-gray-200 p-5">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
@@ -1212,6 +1245,12 @@ export default function HealthPage() {
                       )
                     })}
                   </div>
+                  {allTimeWeightAvg !== null && (
+                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <p className="text-xs text-gray-500">Avg weight <span className="text-gray-400">({weights.length} measurement{weights.length !== 1 ? 's' : ''})</span></p>
+                      <p className="text-sm font-bold text-gray-900">{allTimeWeightAvg} <span className="text-xs font-normal text-gray-400">lbs</span></p>
+                    </div>
+                  )}
                 </div>
 
                 {weights.length > 1 && (
