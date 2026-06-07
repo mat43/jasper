@@ -59,11 +59,13 @@ export async function POST(req) {
       : prompt
     const response = await client.chat.completions.create({
       model: 'gpt-5.5',
-      max_completion_tokens: 512,
+      max_completion_tokens: 1024,
+      response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: messageContent }],
     })
 
-    const text = response.choices[0].message.content.trim()
+    const text = (response.choices[0]?.message?.content ?? '').trim()
+    if (!text) throw new Error('Empty response from model')
 
     let parsed
     try {
@@ -87,12 +89,15 @@ export async function POST(req) {
     })
   } catch (err) {
     logError('POST /api/health/analyze', err)
-    if (err?.status === 401) {
-      return NextResponse.json({ error: 'Invalid OpenAI API key.' }, { status: 503 })
+    const status = err?.status
+    if (status === 401) return NextResponse.json({ error: 'Invalid OpenAI API key.' }, { status: 503 })
+    if (status === 429) return NextResponse.json({ error: 'Rate limit reached — try again in a moment.' }, { status: 503 })
+    if (status === 404) return NextResponse.json({ error: 'AI model unavailable. Try again later.' }, { status: 503 })
+    if (status === 400) return NextResponse.json({ error: 'The image could not be processed. Try a different photo.' }, { status: 422 })
+    if (status >= 500 && status < 600) return NextResponse.json({ error: 'OpenAI is having issues — try again shortly.' }, { status: 503 })
+    if (err?.message === 'Empty response from model') {
+      return NextResponse.json({ error: 'No response from AI — the image may have been refused. Try a clearer photo.' }, { status: 422 })
     }
-    if (err?.status === 429) {
-      return NextResponse.json({ error: 'OpenAI rate limit reached. Try again shortly.' }, { status: 503 })
-    }
-    return NextResponse.json({ error: 'Analysis failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Analysis failed — try again or use text description mode.' }, { status: 500 })
   }
 }

@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
-        domains: ['img.mathew.ws'],
-  },
+        remotePatterns: [
+            { protocol: 'https', hostname: 'img.mathew.ws' },
+        ],
+    },
     output: "standalone",
 };
 
