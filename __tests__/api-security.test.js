@@ -48,6 +48,7 @@ vi.mock('@/lib/prisma', () => ({
     },
     user: {
       findUnique: vi.fn(),
+      findMany:   vi.fn().mockResolvedValue([]),
       update:     vi.fn(),
     },
   },
@@ -64,12 +65,14 @@ import { GET  as templatesGET, POST as templatesPOST }      from '@/app/api/temp
 import { DELETE as templatesDEL }                            from '@/app/api/templates/[id]/route'
 import { GET  as eventsGET }                                 from '@/app/api/events/route'
 import { GET  as weatherGET }                                from '@/app/api/weather/route'
+import { GET  as usersGET }                                  from '@/app/api/users/route'
 import { GET  as userGET }                                   from '@/app/api/users/[username]/route'
 import { PATCH as profilePATCH }                             from '@/app/api/user/profile/route'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const SESSION = { user: { id: 'uid_mat', username: 'mat', name: 'Mat' } }
+const NUTRITION_SESSION = { user: { id: 'uid_kid', username: 'kid', name: 'Kid', nutritionOnly: true } }
 
 function req(url, init = {}) {
   return new Request(url, init)
@@ -246,6 +249,84 @@ describe('Invalid payloads return 400', () => {
       frequency: 'monthly',
     }))
     expect(r.status).toBe(400)
+  })
+})
+
+// ── 3b. Nutrition-only accounts are confined to the nutrition calculator ──────
+
+describe('Nutrition-only accounts are blocked from non-nutrition routes (403)', () => {
+  beforeEach(() => vi.mocked(getServerSession).mockResolvedValue(NUTRITION_SESSION))
+
+  it('GET  /api/expenses → 403',  () => expensesGET(req('http://localhost/api/expenses'))
+    .then(r => expect(r.status).toBe(403)))
+
+  it('POST /api/expenses → 403',  () => expensesPOST(jsonReq('http://localhost/api/expenses', { description: 'x', amount: 1, category: 'other' }))
+    .then(r => expect(r.status).toBe(403)))
+
+  it('DELETE /api/expenses/1 → 403', () => expensesDEL(req('http://localhost/api/expenses/1', { method: 'DELETE' }), ctx({ id: '1' }))
+    .then(r => expect(r.status).toBe(403)))
+
+  it('GET  /api/groceries → 403', () => groceriesGET(req('http://localhost/api/groceries'))
+    .then(r => expect(r.status).toBe(403)))
+
+  it('POST /api/groceries → 403', () => groceriesPOST(jsonReq('http://localhost/api/groceries', { label: 'milk' }))
+    .then(r => expect(r.status).toBe(403)))
+
+  it('GET  /api/templates → 403', () => templatesGET(req('http://localhost/api/templates'))
+    .then(r => expect(r.status).toBe(403)))
+
+  it('GET  /api/events → 403',    () => eventsGET(req('http://localhost/api/events'))
+    .then(r => expect(r.status).toBe(403)))
+
+  it('expense delete is never reached (no Prisma call)', async () => {
+    vi.mocked(prisma.expense.delete).mockClear()
+    await expensesDEL(req('http://localhost/api/expenses/1', { method: 'DELETE' }), ctx({ id: '1' }))
+    expect(prisma.expense.delete).not.toHaveBeenCalled()
+  })
+})
+
+describe('Nutrition-only users are excluded from the expense assignee list', () => {
+  beforeEach(() => vi.mocked(getServerSession).mockResolvedValue(SESSION))
+
+  it('GET /api/users filters out nutritionOnly accounts', async () => {
+    vi.mocked(prisma.user.findMany).mockResolvedValue([{ username: 'mat', name: 'Mat' }])
+    const r = await usersGET(req('http://localhost/api/users'))
+    expect(r.status).toBe(200)
+    expect(prisma.user.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { nutritionOnly: false } })
+    )
+  })
+})
+
+// ── 3c. Admins may bill an expense from any payer; others cannot ──────────────
+
+describe('Expense payer (createdBy) attribution', () => {
+  const ADMIN_SESSION = { user: { id: 'uid_admin', username: 'boss', name: 'Boss', isAdmin: true } }
+
+  it('admin: createdBy in the body is honored', async () => {
+    vi.mocked(getServerSession).mockResolvedValue(ADMIN_SESSION)
+    vi.mocked(prisma.expense.create).mockClear()
+    vi.mocked(prisma.expense.create).mockResolvedValue({ id: 1 })
+    const r = await expensesPOST(jsonReq('http://localhost/api/expenses', {
+      description: 'Rent', amount: 100, category: 'Rent', assignees: ['kid'], createdBy: 'alice',
+    }))
+    expect(r.status).toBe(201)
+    expect(prisma.expense.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ createdBy: 'alice' }) })
+    )
+  })
+
+  it('non-admin: createdBy in the body is ignored (falls back to self)', async () => {
+    vi.mocked(getServerSession).mockResolvedValue(SESSION) // mat, not admin
+    vi.mocked(prisma.expense.create).mockClear()
+    vi.mocked(prisma.expense.create).mockResolvedValue({ id: 2 })
+    const r = await expensesPOST(jsonReq('http://localhost/api/expenses', {
+      description: 'Rent', amount: 100, category: 'Rent', assignees: ['kid'], createdBy: 'alice',
+    }))
+    expect(r.status).toBe(201)
+    expect(prisma.expense.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ createdBy: 'mat' }) })
+    )
   })
 })
 

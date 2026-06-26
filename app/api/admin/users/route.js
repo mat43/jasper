@@ -19,6 +19,7 @@ export async function GET() {
       avatarUrl: true,
       isAdmin: true,
       isActive: true,
+      nutritionOnly: true,
     },
     orderBy: { name: 'asc' },
   })
@@ -31,6 +32,7 @@ const createUserSchema = z.object({
   email: z.string().email().optional().or(z.literal('')),
   password: z.string().min(8).max(128),
   isAdmin: z.boolean().optional().default(false),
+  nutritionOnly: z.boolean().optional().default(false),
 })
 
 // POST /api/admin/users — create a new user (admin only)
@@ -56,6 +58,7 @@ export async function POST(request) {
       password: hashed,
       isAdmin: data.isAdmin,
       isActive: true,
+      nutritionOnly: data.nutritionOnly,
     },
     select: {
       id: true,
@@ -66,6 +69,7 @@ export async function POST(request) {
       avatarUrl: true,
       isAdmin: true,
       isActive: true,
+      nutritionOnly: true,
     },
   })
 

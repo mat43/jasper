@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { requireAuth, parseBody, logError } from '@/lib/auth'
+import { requireFullAccess, parseBody, logError } from '@/lib/auth'
 import { createTemplateSchema } from '@/lib/schemas'
 
 function parseAssignees(raw) {
@@ -13,7 +13,7 @@ function parseAssignees(raw) {
 }
 
 export async function GET() {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   try {
@@ -26,7 +26,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const { session, unauth } = await requireAuth()
+  const { session, unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const { data, bodyError } = await parseBody(request, createTemplateSchema)
@@ -34,6 +34,10 @@ export async function POST(request) {
 
   try {
     const { description, amount, category, assignees, frequency, dayOfMonth, dayOfWeek } = data
+    // Admins may attribute a recurring rule to anyone; others are always the payer.
+    const createdBy = session.user.isAdmin && data.createdBy
+      ? data.createdBy
+      : session.user.username
     const tpl = await prisma.expenseTemplate.create({
       data: {
         description,
@@ -43,7 +47,7 @@ export async function POST(request) {
         frequency,
         dayOfMonth: frequency === 'monthly' ? (dayOfMonth ?? null) : null,
         dayOfWeek:  frequency === 'weekly'  ? (dayOfWeek  ?? null) : null,
-        createdBy:  session.user.username,
+        createdBy,
       },
     })
     return NextResponse.json({ ...tpl, assignees }, { status: 201 })

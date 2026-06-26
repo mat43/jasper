@@ -11,6 +11,7 @@ const updateUserSchema = z.object({
   password:      z.string().min(8).max(128).optional(),
   isAdmin:       z.boolean().optional(),
   isActive:      z.boolean().optional(),
+  nutritionOnly: z.boolean().optional(),
 }).strict()
 
 // PATCH /api/admin/users/[username] — update a user (admin only)
@@ -49,6 +50,7 @@ export async function PATCH(request, { params }) {
       venmoUsername: true,
       isAdmin: true,
       isActive: true,
+      nutritionOnly: true,
     },
   })
   return NextResponse.json(user)

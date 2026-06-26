@@ -19,6 +19,43 @@ function splitName(fullName) {
 	return { firstName, lastName: rest.join(' ') }
 }
 
+// Tiles shown (greyed out / locked) to nutrition-only users — everything that
+// lives outside the nutrition calculator.
+const LOCKED_TILES = [
+	{ title: 'Expenses', subtitle: 'Shared Costs' },
+	{ title: 'Spending', subtitle: 'This month' },
+	{ title: 'Grocery List', subtitle: 'Shared' },
+	{ title: 'Weather', subtitle: 'Forecast' },
+	{ title: 'Upcoming Events', subtitle: 'Calendar' },
+	{ title: 'Climate', subtitle: 'Home' },
+	{ title: 'Home Assistant', subtitle: 'Automations' },
+	{ title: 'Network', subtitle: 'Router & Devices' },
+	{ title: 'Shared Files', subtitle: 'Google Drive' },
+]
+
+// A non-interactive, greyed-out placeholder tile with a "Locked" badge.
+function LockedCard({ title, subtitle }) {
+	return (
+		<div className="relative bg-white rounded-2xl border border-gray-200 p-5 overflow-hidden select-none cursor-not-allowed">
+			<div className="opacity-40">
+				<div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
+					<svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+					</svg>
+				</div>
+				<p className="text-xs text-gray-400 mb-0.5">{subtitle}</p>
+				<p className="font-semibold text-gray-500">{title}</p>
+			</div>
+			<span className="absolute top-3 right-3 inline-flex items-center gap-1 text-[11px] font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+				<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+				</svg>
+				Locked
+			</span>
+		</div>
+	)
+}
+
 export default function HomePage() {
 	const { data: session, status } = useSession();
 	const router = useRouter();
@@ -50,6 +87,9 @@ export default function HomePage() {
 	const { id, username, name, avatarUrl, email, venmoUsername } = session.user;
 	const { firstName, lastName } = splitName(session.user.name)
 
+	// Nutrition-only users: everything except the nutrition calculator is locked.
+	const locked = !!session.user.nutritionOnly
+
 	const me = {
 		name: name,
 		avatarUrl: avatarUrl,
@@ -77,12 +117,25 @@ export default function HomePage() {
 			<div className="max-w-7xl mx-auto px-4 sm:px-6">
 				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
-				{/* Profile (1x1) */}
+				{/* Profile (1x1) — always available so the user can reach settings / log out */}
 				<ProfileCard
 					name={me.name}
 					avatarUrl={me.avatarUrl}
 					settingsOptions={me.settingsOptions}
 				/>
+
+				{locked ? (
+				<>
+					{/* Nutrition — the only live tool for nutrition-only users */}
+					<HealthWidget />
+
+					{/* Everything else is locked / greyed out */}
+					{LOCKED_TILES.map(t => (
+						<LockedCard key={t.title} title={t.title} subtitle={t.subtitle} />
+					))}
+				</>
+				) : (
+				<>
 
 				{/* Weather (1x1) */}
 				<WeatherWidget />
@@ -183,6 +236,8 @@ export default function HomePage() {
 
 				{/* Health & Metrics */}
 				<HealthWidget />
+				</>
+				)}
 
 			</div>
 		</div>

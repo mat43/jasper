@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { requireAuth, parseBody, parseIntId, logError } from '@/lib/auth'
+import { requireFullAccess, parseBody, parseIntId, logError } from '@/lib/auth'
 import { patchExpenseSchema } from '@/lib/schemas'
 
 // DELETE /api/expenses/[id]
 // Only the expense creator may delete their own record.
 export async function DELETE(request, context) {
-  const { session, unauth } = await requireAuth()
+  const { session, unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const id = parseIntId((await context.params).id)
@@ -33,7 +33,7 @@ export async function DELETE(request, context) {
 // PATCH /api/expenses/[id]
 // Any authenticated household member may mark an expense as paid/unpaid.
 export async function PATCH(request, context) {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const id = parseIntId((await context.params).id)

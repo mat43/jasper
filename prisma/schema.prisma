@@ -19,6 +19,7 @@ model User {
   venmoUsername String?
   isAdmin       Boolean   @default(false)
   isActive      Boolean   @default(true)
+  nutritionOnly Boolean   @default(false)  // restricted to the nutrition calculator only
 }
 
 model List {
@@ -66,6 +67,7 @@ model UserHealthProfile {
   proteinGoal      Int     @default(150)
   carbGoal         Int     @default(200)
   fatGoal          Int     @default(65)
+  fiberGoal        Int     @default(28)   // g
   waterGoal        Int     @default(64)   // oz
 }
 
@@ -112,5 +114,15 @@ model WeightLog {
   userId   String
   weight   Float
   loggedAt DateTime @default(now())
+}
+
+model WaterLog {
+  id       Int      @id @default(autoincrement())
+  userId   String
+  amount   Int      @default(0)   // total oz for the day
+  logDate  String                 // YYYY-MM-DD
+  loggedAt DateTime @default(now())
+
+  @@unique([userId, logDate])
 }
 

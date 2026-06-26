@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { requireAuth, parseBody, logError } from '@/lib/auth'
+import { requireFullAccess, parseBody, logError } from '@/lib/auth'
 import { createExpenseSchema } from '@/lib/schemas'
 
 function normalizeAssignees(raw) {
@@ -13,7 +13,7 @@ function normalizeAssignees(raw) {
 }
 
 export async function GET() {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   try {
@@ -29,7 +29,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const { session, unauth } = await requireAuth()
+  const { session, unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const { data, bodyError } = await parseBody(request, createExpenseSchema)
@@ -37,7 +37,11 @@ export async function POST(request) {
 
   try {
     const { description, amount, category, assignees, templateId } = data
-    const createdBy = session.user.username
+    // Admins may bill an expense as if it came from anyone (the "payer").
+    // For everyone else the payer is always themselves.
+    const createdBy = session.user.isAdmin && data.createdBy
+      ? data.createdBy
+      : session.user.username
     const expense = await prisma.expense.create({
       data: {
         description,

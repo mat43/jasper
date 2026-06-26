@@ -11,9 +11,15 @@ export default function AddExpenseCard({
 	handleAmountChange,
 	handleAmountBlur,
 	toggleAssignee,
-	onSuccess
+	onSuccess,
+	isAdmin = false,
+	currentUser = ''
 }) {
 	const [submitError, setSubmitError] = useState('')
+
+	// Who the expense is billed from. Admins can change it; for everyone else
+	// it's always themselves (the API ignores `createdBy` for non-admins).
+	const payer = (isAdmin && newExpense.paidBy) ? newExpense.paidBy : currentUser
 
 	async function submitExpense() {
 		const {
@@ -24,7 +30,8 @@ export default function AddExpenseCard({
 			frequency,
 			dayOfMonth,
 			dayOfWeek,
-			category
+			category,
+			paidBy
 		} = newExpense
 
 		setSubmitError('')
@@ -85,6 +92,11 @@ export default function AddExpenseCard({
 				assignees: assignee ? [assignee] : []
 			}
 
+			// Admins can attribute the expense to a different payer.
+			if (isAdmin && paidBy) {
+				payload.createdBy = paidBy
+			}
+
 			if (recurring) {
 				payload.frequency = frequency
 				if (frequency === 'monthly') {
@@ -127,6 +139,7 @@ export default function AddExpenseCard({
 			amount: '',
 			category: '',
 			assignees: [],
+			paidBy: '',
 			recurring: false,
 			frequency: 'monthly',
 			dayOfMonth: '',
@@ -169,6 +182,30 @@ export default function AddExpenseCard({
 					))}
 				</select>
 			</div>
+
+			{isAdmin && (
+				<div>
+					<label className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-2">
+						Paid by <span className="text-amber-500 normal-case font-medium">(admin)</span>
+					</label>
+					<div className="flex flex-wrap gap-2">
+						{roommates.map(r => (
+							<button
+								key={r.username}
+								onClick={() => setNewExpense(prev => ({ ...prev, paidBy: r.username }))}
+								className={clsx(
+									'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150',
+									payer === r.username
+										? 'bg-amber-100 text-amber-700'
+										: 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+								)}
+							>
+								{r.name?.split(' ')[0] ?? r.username}{r.username === currentUser ? ' (you)' : ''}
+							</button>
+						))}
+					</div>
+				</div>
+			)}
 
 			<div>
 				<label className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-2">Assign to</label>

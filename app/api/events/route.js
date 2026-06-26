@@ -2,10 +2,10 @@
 // Requires an authenticated session; the Google API key is never exposed to clients.
 
 import { NextResponse } from 'next/server'
-import { requireAuth, logError } from '@/lib/auth'
+import { requireFullAccess, logError } from '@/lib/auth'
 
 export async function GET() {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID

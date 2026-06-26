@@ -51,6 +51,7 @@ const MACRO_META = [
   { key: 'protein',  label: 'Protein',  unit: 'g',    color: '#3b82f6', goalKey: 'proteinGoal' },
   { key: 'carbs',    label: 'Carbs',    unit: 'g',    color: '#f59e0b', goalKey: 'carbGoal' },
   { key: 'fat',      label: 'Fat',      unit: 'g',    color: '#8b5cf6', goalKey: 'fatGoal' },
+  { key: 'fiber',    label: 'Fiber',    unit: 'g',    color: '#14b8a6', goalKey: 'fiberGoal' },
 ]
 
 const inputCls = 'block w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition'
@@ -140,6 +141,7 @@ function GoalsModal({ profile, onSave, onClose }) {
     proteinGoal:      profile.proteinGoal,
     carbGoal:         profile.carbGoal,
     fatGoal:          profile.fatGoal,
+    fiberGoal:        profile.fiberGoal,
     waterGoal:        profile.waterGoal,
   })
   const [saving, setSaving] = useState(false)
@@ -163,6 +165,7 @@ function GoalsModal({ profile, onSave, onClose }) {
     ['proteinGoal',      'Protein',        'g'],
     ['carbGoal',         'Carbs',          'g'],
     ['fatGoal',          'Fat',            'g'],
+    ['fiberGoal',        'Fiber',          'g'],
     ['waterGoal',        'Water',          'oz'],
   ]
 
@@ -364,8 +367,9 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
   const [editResult, setEditResult] = useState(null)
   const [mealType, setMealType]     = useState('lunch')
   const [servings, setServings]     = useState(1)
-  const [saving, setSaving]         = useState(false) // false | 'log' | 'library'
+  const [saving, setSaving]         = useState(false) // false | 'log'
   const [error, setError]           = useState('')
+  const [dragging, setDragging]     = useState(false)
   const inputRef = useRef(null)
 
   function switchMode(m) {
@@ -374,11 +378,12 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
     setPreview(null); setImageData(null); setDescription(''); setContext('')
   }
 
-  function handleFile(e) {
-    const file = e.target.files[0]
-    if (!file) return
+  // Load an image from a file picker, drag-drop, or clipboard paste.
+  function loadImageFile(file) {
+    if (!file || !file.type?.startsWith('image/')) return
     const reader = new FileReader()
     reader.onload = ev => {
+      setMode('photo')
       setPreview(ev.target.result)
       setImageData(ev.target.result)
       setResult(null)
@@ -387,6 +392,34 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
     }
     reader.readAsDataURL(file)
   }
+
+  function handleFile(e) {
+    loadImageFile(e.target.files[0])
+    e.target.value = '' // let the same file be re-picked later
+  }
+
+  function handleDrop(e) {
+    e.preventDefault()
+    setDragging(false)
+    loadImageFile(e.dataTransfer.files?.[0])
+  }
+
+  // Accept a pasted image (Cmd/Ctrl-V) anywhere while the modal is open.
+  useEffect(() => {
+    function onPaste(e) {
+      const items = e.clipboardData?.items
+      if (!items) return
+      for (const it of items) {
+        if (it.type?.startsWith('image/')) {
+          const file = it.getAsFile()
+          if (file) { loadImageFile(file); e.preventDefault() }
+          break
+        }
+      }
+    }
+    document.addEventListener('paste', onPaste)
+    return () => document.removeEventListener('paste', onPaste)
+  }, [])
 
   async function handleAnalyze() {
     if (mode === 'photo' && !imageData) return
@@ -419,19 +452,6 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
       servingSize: 1,
       servingUnit: editResult.servingDescription,
     }
-  }
-
-  async function handleSaveToLibrary() {
-    if (!editResult) return
-    setSaving('library')
-    const res = await fetch('/api/health/foods', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(await buildFoodPayload()),
-    })
-    if (res.ok) { onClose() }
-    else { setError('Failed to save to library') }
-    setSaving(false)
   }
 
   async function handleLog() {
@@ -485,21 +505,31 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
         {error && <p className="text-sm text-red-500 bg-red-50 rounded-xl px-3 py-2">{error}</p>}
 
         {mode === 'photo' && (
-          <div onClick={() => !result && inputRef.current?.click()}
-            className={`relative border-2 border-dashed rounded-xl overflow-hidden ${!result ? 'cursor-pointer hover:border-emerald-400' : ''} border-gray-200 transition`}
+          <div
+            onClick={() => !result && inputRef.current?.click()}
+            onDragOver={e => { if (!result) { e.preventDefault(); setDragging(true) } }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            className={`relative border-2 border-dashed rounded-xl overflow-hidden transition ${!result ? 'cursor-pointer hover:border-emerald-400' : ''} ${dragging ? 'border-emerald-400 bg-emerald-50/40' : 'border-gray-200'}`}
             style={{ minHeight: preview ? undefined : '110px' }}>
             {preview
-              ? <img src={preview} alt="food" className="w-full object-cover max-h-44" />
-              : <div className="flex flex-col items-center justify-center h-28 text-gray-400 gap-2">
+              ? <>
+                  <img src={preview} alt="food" className="w-full object-cover max-h-44" />
+                  {!result && (
+                    <span className="absolute bottom-2 right-2 text-xs bg-black/55 text-white px-2 py-0.5 rounded-md">Tap to change</span>
+                  )}
+                </>
+              : <div className="flex flex-col items-center justify-center h-28 text-gray-400 gap-1.5 px-3 text-center">
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <p className="text-sm">Tap to upload or take photo</p>
+                  <p className="text-sm">Tap to choose, take, or drop a photo</p>
+                  <p className="text-xs text-gray-300">From your camera roll, camera, or paste (⌘V)</p>
                 </div>
             }
-            <input ref={inputRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+            <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
           </div>
         )}
 
@@ -553,6 +583,7 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
               {numField('protein',  'Protein (g)')}
               {numField('carbs',    'Carbs (g)')}
               {numField('fat',      'Fat (g)')}
+              {numField('fiber',    'Fiber (g)')}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -571,18 +602,15 @@ function PhotoAnalyzeModal({ date, onAdded, onClose }) {
 
             <div className="flex gap-3">
               <button type="button" onClick={onClose}
-                className="py-2.5 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition">
+                className="py-2.5 px-4 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition">
                 Cancel
-              </button>
-              <button onClick={handleSaveToLibrary} disabled={!!saving}
-                className="flex-1 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 text-sm font-semibold hover:bg-emerald-100 disabled:opacity-50 transition">
-                {saving === 'library' ? 'Saving…' : '+ Library'}
               </button>
               <button onClick={handleLog} disabled={!!saving}
                 className="flex-1 py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 disabled:opacity-50 transition">
                 {saving === 'log' ? 'Saving…' : 'Log This'}
               </button>
             </div>
+            <p className="text-center text-xs text-gray-300">Logged foods are saved to your library automatically.</p>
           </div>
         )}
 
@@ -609,7 +637,7 @@ function SaveMealModal({ logs, onSaved, onClose }) {
     const res = await fetch('/api/health/meals', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), items: logs.map(l => ({ foodItemId: l.foodItemId, servings: l.servings })) }),
+      body: JSON.stringify({ name: name.trim(), items: logs.map(l => ({ foodItemId: l.foodItemId, servings: l.servings, mealType: l.mealType })) }),
     })
     if (res.ok) onSaved(await res.json())
     else { setError('Failed to save'); setSaving(false) }
@@ -675,6 +703,112 @@ function WeightModal({ onSaved, onClose }) {
   )
 }
 
+function LibraryModal({ onClose, onChanged }) {
+  const [items, setItems]         = useState(null) // null = loading
+  const [query, setQuery]         = useState('')
+  const [error, setError]         = useState('')
+  const [busyId, setBusyId]       = useState(null)
+  const [confirmId, setConfirmId] = useState(null)
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/health/foods?mine=1')
+      .then(r => (r.ok ? r.json() : []))
+      .then(d => { if (active) setItems(Array.isArray(d) ? d : []) })
+      .catch(() => { if (active) setItems([]) })
+    return () => { active = false }
+  }, [])
+
+  async function doDelete(item) {
+    setBusyId(item.id); setError('')
+    const res = await fetch(`/api/health/foods/${item.id}`, { method: 'DELETE' })
+    if (res.ok) {
+      const { removedLogs } = await res.json().catch(() => ({ removedLogs: 0 }))
+      setItems(prev => prev.filter(i => i.id !== item.id))
+      setConfirmId(null)
+      if (removedLogs > 0) onChanged?.()
+    } else {
+      const e = await res.json().catch(() => ({}))
+      setError(e.error || 'Failed to delete')
+      setConfirmId(null)
+    }
+    setBusyId(null)
+  }
+
+  const q = query.trim().toLowerCase()
+  const filtered = (items || []).filter(i => !q || i.name.toLowerCase().includes(q))
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-900">My Food Library</h2>
+          <button onClick={onClose} className="text-sm text-gray-400 hover:text-gray-600 transition">Close</button>
+        </div>
+
+        {error && <p className="text-sm text-red-500 bg-red-50 rounded-xl px-3 py-2 mb-3">{error}</p>}
+
+        <input type="text" placeholder="Search your items…" value={query}
+          onChange={e => setQuery(e.target.value)} className={inputCls + ' mb-3'} />
+
+        {items === null ? (
+          <div className="flex justify-center py-10">
+            <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-10">
+            {items.length === 0
+              ? 'Your library is empty. Foods you create or log appear here.'
+              : 'No matches.'}
+          </p>
+        ) : (
+          <ul className="divide-y divide-gray-50 max-h-[55vh] overflow-y-auto -mx-1 px-1">
+            {filtered.map(f => (
+              <li key={f.id} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {f.name}
+                    {f.brand && <span className="text-gray-400 font-normal text-xs ml-1">· {f.brand}</span>}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {f.calories} kcal · P {r1(f.protein)}g · C {r1(f.carbs)}g · F {r1(f.fat)}g · Fiber {r1(f.fiber)}g
+                  </p>
+                  {f._count?.logs > 0 && (
+                    <p className="text-xs text-gray-300 mt-0.5">logged {f._count.logs}×</p>
+                  )}
+                </div>
+                {confirmId === f.id ? (
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button onClick={() => doDelete(f)} disabled={busyId === f.id}
+                      className="px-2.5 py-1.5 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-600 disabled:opacity-50 transition">
+                      {busyId === f.id
+                        ? '…'
+                        : f._count?.logs > 0
+                          ? `Delete + ${f._count.logs} log${f._count.logs !== 1 ? 's' : ''}`
+                          : 'Delete'}
+                    </button>
+                    <button onClick={() => setConfirmId(null)} disabled={busyId === f.id}
+                      className="px-2.5 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 transition">
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => { setConfirmId(f.id); setError('') }}
+                    className="p-2 rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition flex-shrink-0" title="Delete">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Modal>
+  )
+}
+
 // ─── main page ────────────────────────────────────────────────────────────────
 
 export default function HealthPage() {
@@ -690,6 +824,7 @@ export default function HealthPage() {
   const [profile, setProfile]         = useState(null)
   const [meals, setMeals]             = useState([])
   const [weights, setWeights]         = useState([])
+  const [water, setWater]             = useState(0)
   const [loading, setLoading]         = useState(true)
 
   const [showGoals, setShowGoals]         = useState(false)
@@ -697,6 +832,7 @@ export default function HealthPage() {
   const [showPhoto, setShowPhoto]         = useState(false)
   const [showSaveMeal, setShowSaveMeal]   = useState(false)
   const [showWeight, setShowWeight]       = useState(false)
+  const [showLibrary, setShowLibrary]     = useState(false)
 
   const dateStr  = toDateStr(currentDate)
   const isToday  = dateStr === toDateStr(new Date())
@@ -719,6 +855,11 @@ export default function HealthPage() {
     if (res.ok) { setAllLogs(await res.json()); setAllLoaded(true) }
   }, [])
 
+  const fetchWater = useCallback(async (d) => {
+    const res = await fetch(`/api/health/water?date=${d}`)
+    if (res.ok) { const data = await res.json(); setWater(data.amount || 0) }
+  }, [])
+
   // Initial load
   useEffect(() => {
     if (status === 'unauthenticated') { router.push('/login'); return }
@@ -733,11 +874,11 @@ export default function HealthPage() {
       if (profileRes.ok) setProfile(await profileRes.json())
       if (mealsRes.ok)   setMeals(await mealsRes.json())
       if (weightsRes.ok) setWeights(await weightsRes.json())
-      await Promise.all([fetchDayLogs(today), fetchWeekLogs(today)])
+      await Promise.all([fetchDayLogs(today), fetchWeekLogs(today), fetchWater(today)])
       setLoading(false)
     }
     init()
-  }, [status, router, fetchDayLogs, fetchWeekLogs])
+  }, [status, router, fetchDayLogs, fetchWeekLogs, fetchWater])
 
   // Lazy-load all-time when tab first opened
   useEffect(() => {
@@ -749,7 +890,19 @@ export default function HealthPage() {
     if (status !== 'authenticated' || loading) return
     fetchDayLogs(dateStr)
     fetchWeekLogs(dateStr)
-  }, [dateStr, status, loading, fetchDayLogs, fetchWeekLogs])
+    fetchWater(dateStr)
+  }, [dateStr, status, loading, fetchDayLogs, fetchWeekLogs, fetchWater])
+
+  async function addWater(delta) {
+    setWater(w => Math.max(0, w + delta)) // optimistic
+    const res = await fetch('/api/health/water', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: delta, logDate: dateStr }),
+    })
+    if (res.ok) { const data = await res.json(); setWater(data.amount) }
+    else { fetchWater(dateStr) } // revert to server truth on failure
+  }
 
   // ── mutations (local state only) ────────────────────────────────────────────
 
@@ -774,7 +927,7 @@ export default function HealthPage() {
         fetch('/api/health/log', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ foodItemId: item.foodItemId, mealType: 'snack', servings: item.servings, logDate: dateStr }),
+          body: JSON.stringify({ foodItemId: item.foodItemId, mealType: item.mealType || 'snack', servings: item.servings, logDate: dateStr }),
         }).then(r => r.ok ? r.json() : null)
       )
     )
@@ -808,6 +961,7 @@ export default function HealthPage() {
     protein:  loggedDays.reduce((s,d)=>s+d.protein,0)  / loggedDays.length,
     carbs:    loggedDays.reduce((s,d)=>s+d.carbs,0)    / loggedDays.length,
     fat:      loggedDays.reduce((s,d)=>s+d.fat,0)      / loggedDays.length,
+    fiber:    loggedDays.reduce((s,d)=>s+d.fiber,0)    / loggedDays.length,
   } : null
 
   const allByDay     = allLogs.reduce((acc, l) => { (acc[l.logDate] ??= []).push(l); return acc }, {})
@@ -817,6 +971,7 @@ export default function HealthPage() {
     protein:  allDayTotals.reduce((s,d)=>s+d.protein,0)  / allDayTotals.length,
     carbs:    allDayTotals.reduce((s,d)=>s+d.carbs,0)    / allDayTotals.length,
     fat:      allDayTotals.reduce((s,d)=>s+d.fat,0)      / allDayTotals.length,
+    fiber:    allDayTotals.reduce((s,d)=>s+d.fiber,0)    / allDayTotals.length,
   } : null
 
   const weekDateSet     = new Set(weekDays.map(d => format(d, 'yyyy-MM-dd')))
@@ -899,6 +1054,12 @@ export default function HealthPage() {
               className="p-2 rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition" title="Log weight">
               ⚖️
             </button>
+            <button onClick={() => setShowLibrary(true)}
+              className="p-2 rounded-xl border border-gray-200 bg-white text-gray-500 hover:bg-gray-50 transition" title="My food library">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.247m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.247" />
+              </svg>
+            </button>
             <button onClick={() => setShowGoals(true)}
               className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
               Goals
@@ -953,9 +1114,39 @@ export default function HealthPage() {
                   <MacroBar label="Protein" consumed={dailyMacros.protein} goal={profile.proteinGoal} color="#3b82f6" />
                   <MacroBar label="Carbs"   consumed={dailyMacros.carbs}   goal={profile.carbGoal}    color="#f59e0b" />
                   <MacroBar label="Fat"     consumed={dailyMacros.fat}     goal={profile.fatGoal}     color="#8b5cf6" />
-                  <MacroBar label="Fiber"   consumed={dailyMacros.fiber}   goal={25}                  color="#10b981" />
+                  <MacroBar label="Fiber"   consumed={dailyMacros.fiber}   goal={profile.fiberGoal}   color="#14b8a6" />
                 </div>
               </div>
+            </div>
+
+            {/* Water */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">💧 Water</p>
+                <p className="text-sm font-semibold text-gray-700 tabular-nums">
+                  {water}<span className="text-gray-400 font-normal"> / {profile.waterGoal} oz</span>
+                </p>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+                <div className="h-full rounded-full bg-sky-400 transition-all duration-500"
+                  style={{ width: `${profile.waterGoal > 0 ? Math.min((water / profile.waterGoal) * 100, 100) : 0}%` }} />
+              </div>
+              {!isFuture && (
+                <div className="flex items-center gap-2">
+                  <button onClick={() => addWater(8)}
+                    className="px-3 py-1.5 rounded-lg bg-sky-50 text-sky-600 text-xs font-semibold hover:bg-sky-100 transition">
+                    + 8 oz
+                  </button>
+                  <button onClick={() => addWater(16)}
+                    className="px-3 py-1.5 rounded-lg bg-sky-50 text-sky-600 text-xs font-semibold hover:bg-sky-100 transition">
+                    + 16 oz
+                  </button>
+                  <button onClick={() => addWater(-8)} disabled={water <= 0}
+                    className="ml-auto px-3 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition">
+                    − 8 oz
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* AI photo */}
@@ -1186,7 +1377,8 @@ export default function HealthPage() {
                           <th className="text-right px-3 py-2.5 font-medium">Cal</th>
                           <th className="text-right px-3 py-2.5 font-medium">Protein</th>
                           <th className="text-right px-3 py-2.5 font-medium">Carbs</th>
-                          <th className="text-right px-5 py-2.5 font-medium">Fat</th>
+                          <th className="text-right px-3 py-2.5 font-medium">Fat</th>
+                          <th className="text-right px-5 py-2.5 font-medium">Fiber</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
@@ -1199,7 +1391,8 @@ export default function HealthPage() {
                             <td className="px-3 py-3 text-right tabular-nums text-gray-700">{d.hasData ? Math.round(d.calories) : <span className="text-gray-200">—</span>}</td>
                             <td className="px-3 py-3 text-right tabular-nums text-gray-500">{d.hasData ? r1(d.protein)+'g' : <span className="text-gray-200">—</span>}</td>
                             <td className="px-3 py-3 text-right tabular-nums text-gray-500">{d.hasData ? r1(d.carbs)+'g'   : <span className="text-gray-200">—</span>}</td>
-                            <td className="px-5 py-3 text-right tabular-nums text-gray-500">{d.hasData ? r1(d.fat)+'g'     : <span className="text-gray-200">—</span>}</td>
+                            <td className="px-3 py-3 text-right tabular-nums text-gray-500">{d.hasData ? r1(d.fat)+'g'     : <span className="text-gray-200">—</span>}</td>
+                            <td className="px-5 py-3 text-right tabular-nums text-gray-500">{d.hasData ? r1(d.fiber)+'g'   : <span className="text-gray-200">—</span>}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1308,6 +1501,11 @@ export default function HealthPage() {
       {showPhoto    && <PhotoAnalyzeModal date={dateStr} onAdded={handleEntryAdded} onClose={() => setShowPhoto(false)} />}
       {showSaveMeal && <SaveMealModal logs={logs} onSaved={m => { setMeals(prev => [m, ...prev]); setShowSaveMeal(false) }} onClose={() => setShowSaveMeal(false)} />}
       {showWeight   && <WeightModal onSaved={w => { setWeights(prev => [w, ...prev]); setShowWeight(false) }} onClose={() => setShowWeight(false)} />}
+      {showLibrary  && <LibraryModal onClose={() => setShowLibrary(false)} onChanged={() => {
+        fetchDayLogs(dateStr)
+        fetchWeekLogs(dateStr)
+        setAllLogs([]); setAllLoaded(false)
+      }} />}
     </div>
   )
 }

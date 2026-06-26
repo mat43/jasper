@@ -3,15 +3,30 @@ import prisma from '@/lib/prisma'
 import { requireAuth, parseBody, logError } from '@/lib/auth'
 import { createFoodItemSchema } from '@/lib/schemas'
 
-// Search all food items (shared library — anyone can use any item)
+// Search the shared food library (anyone can log any item), OR browse the
+// caller's own library with `?mine=1` — used by the Library manager, which
+// also needs each item's log-usage count to warn before deleting.
 export async function GET(req) {
-  const { unauth } = await requireAuth()
+  const { session, unauth } = await requireAuth()
   if (unauth) return unauth
 
   const { searchParams } = new URL(req.url)
-  const q = (searchParams.get('q') || '').trim()
+  const q    = (searchParams.get('q') || '').trim()
+  const mine = searchParams.get('mine') === '1'
 
   try {
+    if (mine) {
+      const where = { createdBy: session.user.username }
+      if (q) where.name = { contains: q }
+      const foods = await prisma.foodItem.findMany({
+        where,
+        orderBy: { id: 'desc' }, // most recently added first — easiest to clean up
+        take: 300,
+        include: { _count: { select: { logs: true } } },
+      })
+      return NextResponse.json(foods)
+    }
+
     const foods = await prisma.foodItem.findMany({
       where: q ? { name: { contains: q } } : undefined,
       orderBy: { name: 'asc' },

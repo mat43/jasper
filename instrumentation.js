@@ -17,18 +17,19 @@ export async function register() {
   // Node.js 22+ exposes a native localStorage global when Next.js Turbopack
   // passes --localstorage-file. If the path is invalid the object exists but
   // has no working methods, crashing SSR. Patch it with a no-op store.
-  if (
-    typeof globalThis.localStorage !== 'undefined' &&
-    typeof globalThis.localStorage.getItem !== 'function'
-  ) {
-    const store = {}
-    globalThis.localStorage = {
-      getItem:    (k) => store[k] ?? null,
-      setItem:    (k, v) => { store[k] = String(v) },
-      removeItem: (k) => { delete store[k] },
-      clear:      () => { Object.keys(store).forEach(k => delete store[k]) },
-      get length() { return Object.keys(store).length },
-      key:        (i) => Object.keys(store)[i] ?? null,
+  if (typeof globalThis.localStorage !== 'undefined') {
+    let broken = false
+    try { globalThis.localStorage.getItem('__probe__') } catch { broken = true }
+    if (broken) {
+      const store = {}
+      globalThis.localStorage = {
+        getItem:    (k) => store[k] ?? null,
+        setItem:    (k, v) => { store[k] = String(v) },
+        removeItem: (k) => { delete store[k] },
+        clear:      () => { Object.keys(store).forEach(k => delete store[k]) },
+        get length() { return Object.keys(store).length },
+        key:        (i) => Object.keys(store)[i] ?? null,
+      }
     }
   }
 }

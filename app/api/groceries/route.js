@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
-import { requireAuth, parseBody, logError } from '@/lib/auth'
+import { requireFullAccess, parseBody, logError } from '@/lib/auth'
 import {
   createGrocerySchema,
   patchGrocerySchema,
@@ -8,7 +8,7 @@ import {
 } from '@/lib/schemas'
 
 export async function GET() {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   try {
@@ -21,7 +21,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const { data, bodyError } = await parseBody(request, createGrocerySchema)
@@ -37,7 +37,7 @@ export async function POST(request) {
 }
 
 export async function PATCH(request) {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const { data, bodyError } = await parseBody(request, patchGrocerySchema)
@@ -56,7 +56,7 @@ export async function PATCH(request) {
 }
 
 export async function DELETE(request) {
-  const { unauth } = await requireAuth()
+  const { unauth } = await requireFullAccess()
   if (unauth) return unauth
 
   const { data, bodyError } = await parseBody(request, deleteGrocerySchema)

@@ -26,6 +26,7 @@ export default function ExpensesPage() {
 		amount: '',
 		category: '',
 		assignees: [],
+		paidBy: '',             // admin-only: bill the expense from this user
 		recurring: false,
 		frequency: 'monthly',   // default
 		dayOfMonth: '',         // for monthly
@@ -151,6 +152,8 @@ export default function ExpensesPage() {
 					handleAmountChange={handleAmountChange}
 					handleAmountBlur={handleAmountBlur}
 					toggleAssignee={toggleAssignee}
+					isAdmin={!!session?.user?.isAdmin}
+					currentUser={currentUser}
 					onSuccess={() => {
 						fetchExpenses()
 						fetchTemplates()

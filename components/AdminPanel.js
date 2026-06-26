@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { X, ShieldCheck, ShieldOff, KeyRound, Trash2, UserPlus, Check, AlertTriangle } from 'lucide-react'
+import { X, ShieldCheck, ShieldOff, KeyRound, Trash2, UserPlus, Check, AlertTriangle, Salad } from 'lucide-react'
 
 export default function AdminPanel({ onClose }) {
   const { data: session } = useSession()
@@ -57,6 +57,17 @@ export default function AdminPanel({ onClose }) {
     if (!res.ok) { showToast('Failed to update status', 'error'); return }
     setUsers(u => u.map(x => x.username === username ? { ...x, isActive: !currentIsActive } : x))
     showToast(`${username} ${!currentIsActive ? 'activated' : 'deactivated'}`)
+  }
+
+  async function toggleNutritionOnly(username, current) {
+    const res = await fetch(`/api/admin/users/${username}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nutritionOnly: !current }),
+    })
+    if (!res.ok) { showToast('Failed to update access', 'error'); return }
+    setUsers(u => u.map(x => x.username === username ? { ...x, nutritionOnly: !current } : x))
+    showToast(`${username} ${!current ? 'restricted to nutrition only' : 'given full access'}`)
   }
 
   async function deleteUser(username) {
@@ -137,12 +148,28 @@ export default function AdminPanel({ onClose }) {
                       Inactive
                     </span>
                   )}
+                  {user.nutritionOnly && (
+                    <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">
+                      Nutrition only
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-gray-400 truncate">@{user.username} {user.email ? `· ${user.email}` : ''}</p>
               </div>
 
               {/* Actions */}
               <div className="flex items-center gap-1 shrink-0">
+                {/* Toggle nutrition-only access */}
+                <button
+                  onClick={() => toggleNutritionOnly(user.username, user.nutritionOnly)}
+                  title={user.nutritionOnly ? 'Give full access' : 'Restrict to nutrition calculator only'}
+                  className={`p-2 rounded-lg hover:bg-gray-100 transition-colors ${
+                    user.nutritionOnly ? 'text-emerald-600' : 'text-gray-500 hover:text-emerald-600'
+                  }`}
+                >
+                  <Salad className="w-4 h-4" />
+                </button>
+
                 {/* Toggle admin */}
                 <button
                   onClick={() => toggleAdmin(user.username, user.isAdmin)}
@@ -314,7 +341,7 @@ function ConfirmDeleteModal({ user, onClose, onConfirm }) {
 }
 
 function CreateUserModal({ onClose, onSuccess, onError }) {
-  const [form, setForm] = useState({ username: '', name: '', email: '', password: '', isAdmin: false })
+  const [form, setForm] = useState({ username: '', name: '', email: '', password: '', isAdmin: false, nutritionOnly: false })
   const [submitting, setSubmitting] = useState(false)
   const [fieldError, setFieldError] = useState('')
 
@@ -359,8 +386,12 @@ function CreateUserModal({ onClose, onSuccess, onError }) {
         <input type="email" placeholder="Email (optional)" {...field('email')} className="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/50" />
         <input type="password" placeholder="Password (min 8 chars)" {...field('password')} className="w-full border border-gray-200 bg-gray-50 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/50" />
         <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
-          <input type="checkbox" checked={form.isAdmin} onChange={e => setForm(f => ({ ...f, isAdmin: e.target.checked }))} className="rounded" />
+          <input type="checkbox" checked={form.isAdmin} onChange={e => setForm(f => ({ ...f, isAdmin: e.target.checked, nutritionOnly: e.target.checked ? false : f.nutritionOnly }))} className="rounded" />
           Grant admin access
+        </label>
+        <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+          <input type="checkbox" checked={form.nutritionOnly} onChange={e => setForm(f => ({ ...f, nutritionOnly: e.target.checked, isAdmin: e.target.checked ? false : f.isAdmin }))} className="rounded" />
+          <span>Nutrition calculator only <span className="text-gray-400">— no expenses or other tools</span></span>
         </label>
         <div className="flex justify-end gap-2 pt-1">
           <button type="button" onClick={onClose} className="px-4 py-2 text-sm rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">Cancel</button>
