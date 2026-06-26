@@ -7,7 +7,8 @@ import { Trash2Icon, ChevronLeft, ChevronRight, X, AlertTriangle } from 'lucide-
 export default function TransactionsTable({
 	transactions = [],
 	onDelete,
-	currentUser = '', // e.g., session.user.username or .name
+	currentUser = '',
+	isAdmin = false,
 }) {
 	const ITEMS_PER_PAGE = 15
 	const [currentPage, setCurrentPage] = useState(1)
@@ -18,12 +19,6 @@ export default function TransactionsTable({
 	const [markUnpaidModal, setMarkUnpaidModal] = useState(null)
 	const [paymentMethod, setPaymentMethod] = useState('manual')
 	const [venmoUsername, setVenmoUsername] = useState('')
-
-	// Debug log
-	useEffect(() => {
-		console.log('TransactionsTable currentUser:', currentUser)
-		console.log('Sample transaction:', transactions[0])
-	}, [currentUser, transactions])
 
 	// Reset to page 1 if transactions change
 	useEffect(() => {
@@ -219,19 +214,6 @@ export default function TransactionsTable({
 							const assignees = getAssignees(t.assignees)
 							const isCreator = t.createdBy === currentUser
 							const isAssignee = assignees.includes(currentUser)
-							const isMathew = currentUser === 'Mathew' || currentUser === 'mathew'
-							
-							// Debug: log for first transaction
-							if (t.id === paginatedTransactions[0].id) {
-								console.log('Debug Transaction Actions:', {
-									currentUser,
-									createdBy: t.createdBy,
-									assignees,
-									isCreator,
-									isAssignee,
-									isMathew
-								})
-							}
 							
 							return (
 								<tr key={t.id} className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 last:border-0 ${t.paid ? 'bg-green-50/30 dark:bg-green-950/10' : ''}`}>
@@ -254,11 +236,6 @@ export default function TransactionsTable({
 									</td>
 									<td className="py-3 px-3">
 										<div className="flex justify-center gap-2">
-											{/* Debug: Always show at least one button if currentUser exists */}
-											{!currentUser && (
-												<span className="text-xs text-gray-400">No user</span>
-											)}
-											
 											{/* Assignee actions (if you owe this expense) */}
 											{currentUser && isAssignee && !isCreator && (
 												<>
@@ -312,8 +289,8 @@ export default function TransactionsTable({
 												</>
 											)}
 
-											{/* Mathew's force delete (if not creator) */}
-											{currentUser && isMathew && !isCreator && (
+											{/* Admin force delete (if not creator) */}
+											{currentUser && isAdmin && !isCreator && (
 												<button
 													onClick={() => setForceDeleteModal(t)}
 													className="px-3 py-1.5 text-xs font-medium text-white bg-linear-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 rounded-lg shadow-md hover:shadow-lg transition-all"

@@ -270,6 +270,7 @@ export default function ExpensesPage() {
 					transactions={transactions}
 					onDelete={id => setTransactions(ts => ts.filter(t => t.id !== id))}
 					currentUser={session?.user?.username || session?.user?.name || ''}
+					isAdmin={!!session?.user?.isAdmin}
 				/>
 			) : (
 				<RecurringRulesTable
